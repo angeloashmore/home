@@ -120,32 +120,31 @@ in {
 
   programs.neovim = {
     enable = true;
-    viAlias = true;
-    vimAlias = true;
+    withNodeJs = true;
     extraConfig = builtins.readFile ./init.vim;
-    plugins = with pkgs.vimPlugins; [
-      auto-pairs
-      # coc-css
-      # coc-eslint
-      # coc-jest
-      # coc-json
-      # coc-nvim
-      # coc-prettier
-      # coc-tsserver
-      fzf-vim
-      lightline-vim
-      tmux-navigator
-      vim-abolish
-      vim-commentary
-      vim-easy-align
-      vim-fugitive
-      vim-polyglot
-      vim-repeat
-      vim-rhubarb
-      vim-sensible
-      vim-surround
-      vim-vinegar
-      vista-vim
+    plugins = [
+      pkgs.vimPlugins.auto-pairs
+      pkgs.vimPlugins.coc-css
+      pkgs.vimPlugins.coc-eslint
+      pkgs.vimPlugins.coc-jest
+      pkgs.vimPlugins.coc-json
+      pkgs.vimPlugins.coc-nvim
+      pkgs.vimPlugins.coc-prettier
+      pkgs.vimPlugins.coc-tsserver
+      pkgs.vimPlugins.coc-vimlsp
+      pkgs.vimPlugins.fzf-vim
+      pkgs.vimPlugins.lightline-vim
+      pkgs.vimPlugins.tmux-navigator
+      pkgs.vimPlugins.vim-abolish
+      pkgs.vimPlugins.vim-commentary
+      pkgs.vimPlugins.vim-easy-align
+      pkgs.vimPlugins.vim-fugitive
+      pkgs.vimPlugins.vim-polyglot
+      pkgs.vimPlugins.vim-repeat
+      pkgs.vimPlugins.vim-rhubarb
+      pkgs.vimPlugins.vim-sensible
+      pkgs.vimPlugins.vim-surround
+      pkgs.vimPlugins.vim-vinegar
       nvim-miniyank
       space-vim-theme
       vim-scratch

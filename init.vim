@@ -85,16 +85,6 @@
 " Allow netrw to remove non-empty local directories
     let g:netrw_rmdir_cmd = 'trash'
 
-" Vista
-    " Use coc.nvim LSP symbols.
-    let g:vista_default_executive = 'coc'
-
-    " Disable special icons (displaying icons requires special font).
-    let g:vista#renderer#enable_icon = 0
-
-    " Set default width.
-    let g:vista_sidebar_width = 50
-
 " coc.nvim
     " Update diagnostics every 300 milliseconds.
     set updatetime=300
