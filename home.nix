@@ -48,15 +48,15 @@ in {
   # changes in each release.
   home.stateVersion = "20.09";
 
-  home.packages = [
-    pkgs.reattach-to-user-namespace
+  home.packages = with pkgs; [
+    reattach-to-user-namespace
+    trash-cli
+    fzf
   ];
 
   programs.zsh = {
     enable = true;
-    enableAutosuggestions = true;
     enableCompletion = true;
-    defaultKeymap = "vicmd";
     oh-my-zsh = {
       enable = true;
       plugins = [
@@ -97,8 +97,8 @@ in {
       '
     '';
     initExtraBeforeCompInit = ''
-      if [ -e '$HOME/.nix-profile/etc/profile.d/nix.sh' ]; then
-        . $HOME/.nix-profile/etc/profile.d/nix.sh
+      if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
       fi
     '';
   };
@@ -125,13 +125,13 @@ in {
     extraConfig = builtins.readFile ./init.vim;
     plugins = with pkgs.vimPlugins; [
       auto-pairs
-      coc-css
-      coc-eslint
-      coc-jest
-      coc-json
-      coc-nvim
-      coc-prettier
-      coc-tsserver
+      # coc-css
+      # coc-eslint
+      # coc-jest
+      # coc-json
+      # coc-nvim
+      # coc-prettier
+      # coc-tsserver
       fzf-vim
       lightline-vim
       tmux-navigator
