@@ -83,7 +83,7 @@ in {
           owner = "zsh-users";
           repo = "zsh-syntax-highlighting";
           rev = "4cf464f843902b6e1e2778b85b70f4c098789b6f";
-          sha256 = "0000000000000000000000000000000000000000000000000000";
+          sha256 = "0s197576djz1ysk0s5zlmw4v657v0f598mkmqzk32wgs4yvfqabx";
         };
       }
     ];
@@ -95,6 +95,11 @@ in {
        --color=info:#2d9574,prompt:#b2b2b2,pointer:#bc6ec5
        --color=marker:#B1951D,spinner:#43505c,header:#43505c
       '
+    '';
+    initExtraBeforeCompInit = ''
+      if [ -e '$HOME/.nix-profile/etc/profile.d/nix.sh' ]; then
+        . $HOME/.nix-profile/etc/profile.d/nix.sh
+      fi
     '';
   };
 
