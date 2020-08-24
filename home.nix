@@ -66,6 +66,8 @@ in {
     shellAliases = {
       cask = "/usr/local/bin/brew cask";
       brew-bundle = "/usr/local/bin/brew bundle";
+      docker = "/usr/local/bin/docker";
+      docker-compose = "/usr/local/bin/docker-compose";
     };
     oh-my-zsh = {
       enable = true;
