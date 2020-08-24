@@ -49,10 +49,16 @@ in {
   home.stateVersion = "20.09";
 
   home.packages = with pkgs; [
+    fzf
+    gitAndTools.hub
+    pwgen
     reattach-to-user-namespace
     trash-cli
-    fzf
   ];
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
 
   programs.zsh = {
     enable = true;
@@ -92,7 +98,6 @@ in {
       }
     ];
     envExtra = ''
-      export EDITOR=nvim
       export FZF_DEFAULT_OPTS='
        --color=fg:#b2b2b2,bg:#292b2e,hl:#4f97d7
        --color=fg+:#e5e5e5,bg+:#444155,hl+:#bc6ec5
