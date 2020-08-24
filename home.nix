@@ -57,6 +57,10 @@ in {
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+    shellAliases = {
+      cask = "/usr/local/bin/brew cask";
+      brew-bundle = "/usr/local/bin/brew bundle";
+    };
     oh-my-zsh = {
       enable = true;
       plugins = [
