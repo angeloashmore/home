@@ -51,6 +51,7 @@ in {
   home.packages = with pkgs; [
     fzf
     gitAndTools.hub
+    jetbrains-mono
     pwgen
     reattach-to-user-namespace
     trash-cli
