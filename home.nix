@@ -51,6 +51,7 @@ in {
   home.packages = with pkgs; [
     fzf
     gitAndTools.hub
+    jetbrains-mono
     pwgen
     reattach-to-user-namespace
     trash-cli
@@ -68,6 +69,8 @@ in {
       brew-bundle = "/usr/local/bin/brew bundle";
       docker = "/usr/local/bin/docker";
       docker-compose = "/usr/local/bin/docker-compose";
+      docker-credential-desktop = "/usr/local/bin/docker-credential-desktop";
+      docker-credential-osxkeychain = "/usr/local/bin/docker-credential-desktop";
     };
     oh-my-zsh = {
       enable = true;
@@ -120,6 +123,9 @@ in {
     userEmail = "angeloashmore@users.noreply.github.com";
     ignores = [ ".DS_Store" ];
     extraConfig = {
+      init = {
+        defaultBranch = "main";
+      };
       pull = {
         rebase = false;
       };
