@@ -120,6 +120,9 @@ in {
     userEmail = "angeloashmore@users.noreply.github.com";
     ignores = [ ".DS_Store" ];
     extraConfig = {
+      init = {
+        defaultBranch = "main";
+      };
       pull = {
         rebase = false;
       };
