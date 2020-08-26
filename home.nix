@@ -68,6 +68,8 @@ in {
       brew-bundle = "/usr/local/bin/brew bundle";
       docker = "/usr/local/bin/docker";
       docker-compose = "/usr/local/bin/docker-compose";
+      docker-credential-desktop = "/usr/local/bin/docker-credential-desktop";
+      docker-credential-osxkeychain = "/usr/local/bin/docker-credential-desktop";
     };
     oh-my-zsh = {
       enable = true;
