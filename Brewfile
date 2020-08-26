@@ -3,7 +3,7 @@
 
 tap 'homebrew/cask'
 
-cask_args appdir: "~Applications"
+cask_args appdir: "~/Applications"
 
 cask 'adobe-creative-cloud'
 cask 'basecamp'

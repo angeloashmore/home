@@ -1,0 +1,212 @@
+{
+  "entries": {
+    "tap": {
+      "homebrew/cask": {
+        "revision": "dcc8098dcdd69bc91b0caef3e29509da4eb07fe8"
+      }
+    },
+    "cask": {
+      "adobe-creative-cloud": {
+        "version": "5.2.0.436",
+        "options": {
+          "full_name": "adobe-creative-cloud",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "basecamp": {
+        "version": "3",
+        "options": {
+          "full_name": "basecamp",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "dash": {
+        "version": "5.3.0",
+        "options": {
+          "full_name": "dash",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "discord": {
+        "version": "0.0.258",
+        "options": {
+          "full_name": "discord",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "docker": {
+        "version": "2.3.0.4,46911",
+        "options": {
+          "full_name": "docker",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "firefox": {
+        "version": "79.0",
+        "options": {
+          "full_name": "firefox",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "google-chrome": {
+        "version": "84.0.4147.135",
+        "options": {
+          "full_name": "google-chrome",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "imageoptim": {
+        "version": "1.8.8",
+        "options": {
+          "full_name": "imageoptim",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "insomnia": {
+        "version": "2020.3.3",
+        "options": {
+          "full_name": "insomnia",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "iterm2": {
+        "version": "3.3.12",
+        "options": {
+          "full_name": "iterm2",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "keepassx": {
+        "version": "2.0.3",
+        "options": {
+          "full_name": "keepassx",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "postico": {
+        "version": "1.5.14",
+        "options": {
+          "full_name": "postico",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "rectangle": {
+        "version": "0.31",
+        "options": {
+          "full_name": "rectangle",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "sequel-pro": {
+        "version": "1.1.2",
+        "options": {
+          "full_name": "sequel-pro",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "signal": {
+        "version": "1.34.5",
+        "options": {
+          "full_name": "signal",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "sketch": {
+        "version": "68-102490",
+        "options": {
+          "full_name": "sketch",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "steermouse": {
+        "version": "5.4.5",
+        "options": {
+          "full_name": "steermouse",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "the-unarchiver": {
+        "version": "4.2.2,129:1590582775",
+        "options": {
+          "full_name": "the-unarchiver",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "toggl": {
+        "version": "7.5.245",
+        "options": {
+          "full_name": "toggl",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "visual-studio-code": {
+        "version": "1.48.1",
+        "options": {
+          "full_name": "visual-studio-code",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "zoomus": {
+        "version": "5.2.44040.0816",
+        "options": {
+          "full_name": "zoomus",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      }
+    }
+  },
+  "system": {
+    "macos": {
+      "catalina": {
+        "HOMEBREW_VERSION": "2.4.13",
+        "HOMEBREW_PREFIX": "/usr/local",
+        "Homebrew/homebrew-core": "1f5a6e851d459953a571cb6021037294955b243d",
+        "CLT": "11.5.0.0.1.1588476445",
+        "Xcode": "11.5",
+        "macOS": "10.15.6"
+      }
+    }
+  }
+}
