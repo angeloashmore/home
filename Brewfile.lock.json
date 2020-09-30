@@ -2,7 +2,7 @@
   "entries": {
     "tap": {
       "homebrew/cask": {
-        "revision": "6c78c7a143b85c11d224b9b6e4f0cb44bae1ac5c"
+        "revision": "e0919cf0066439b4fe325414408ebd4b2b35c8ba"
       }
     },
     "cask": {
@@ -203,6 +203,33 @@
             "appdir": "~/Applications"
           }
         }
+      },
+      "gotomeeting": {
+        "version": "10.12.0,18425",
+        "options": {
+          "full_name": "gotomeeting",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "appcleaner": {
+        "version": "3.5",
+        "options": {
+          "full_name": "appcleaner",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "boop": {
+        "version": "1.3.0",
+        "options": {
+          "full_name": "boop",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
       }
     }
   },
@@ -211,7 +238,7 @@
       "catalina": {
         "HOMEBREW_VERSION": "2.5.2",
         "HOMEBREW_PREFIX": "/usr/local",
-        "Homebrew/homebrew-core": "2da403612205f0e99d3345415930cd84d27a46e0",
+        "Homebrew/homebrew-core": "b16b9af25c3fa784bce5844c5bc50e58e0f8fa80",
         "CLT": "12.0.0.0.1.1599194153",
         "Xcode": "12.0",
         "macOS": "10.15.6"
