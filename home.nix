@@ -50,7 +50,7 @@ in {
 
   home.packages = with pkgs; [
     fzf
-    gitAndTools.hub
+    gitAndTools.gh
     jetbrains-mono
     pwgen
     reattach-to-user-namespace
