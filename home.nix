@@ -10,13 +10,13 @@ let
       sha256 = "02223q6gazr6hb827gc6hq8sbhjk87r232ji60rbjl3qhcim9bdg";
     };
   };
-  space-vim-theme = pkgs.vimUtils.buildVimPlugin {
-    name = "space-vim-theme";
+  vim-code-dark = pkgs.vimUtils.buildVimPlugin {
+    name = "vim-code-dark";
     src = pkgs.fetchFromGitHub {
-      owner = "liuchengxu";
-      repo = "space-vim-theme";
-      rev = "4790dbba31f678f75af4f4c7a1465008542bd979";
-      sha256 = "1nv099x5qq8mal9dwjj29dk357mzhn4vb9wljhglra9imammrz43";
+      owner = "tomasiser";
+      repo = "vim-code-dark";
+      rev = "9a76050073754a8ccc57cc0c1c51aa4328b00097";
+      sha256 = "1hsq08y68iqmwkscf4zr7lgmw3r6v97gbafj5z0g1flzvb98ly0s";
     };
   };
   nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
@@ -28,8 +28,83 @@ let
       sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
     };
   };
+  indentLine = pkgs.vimUtils.buildVimPlugin {
+    name = "indentLine";
+    src = pkgs.fetchFromGitHub {
+      owner = "Yggdroot";
+      repo = "indentLine";
+      rev = "6107214eff0cac5d9810d29ae8614ddfdfcd986b";
+      sha256 = "1aycs427w9w5hjnif5c13wf3jd872a3i94zzdfisfrispbs3ad2m";
+    };
+  };
+  tree-sitter-ts = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "tree-sitter-ts-${version}";
+    src = builtins.fetchGit {
+      "ref" = "master";
+      "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
+      "rev" = "07a12bdf024d66d267bd7f96870f8bbbaceaa5d9";
+    };
+    buildPhase = ''
+      runHook preBuild
+      mkdir -p parser/
+      $CC -o parser/typescript.so -I$src/typescript/src $src/typescript/src/parser.c $src/typescript/src/scanner.c -shared  -Os -lstdc++ -fPIC
+      runHook postBuild
+    '';
+  };
+  tree-sitter-tsx = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "tree-sitter-tsx-${version}";
+    src = builtins.fetchGit {
+      "ref" = "master";
+      "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
+      "rev" = "07a12bdf024d66d267bd7f96870f8bbbaceaa5d9";
+    };
+    buildPhase = ''
+      runHook preBuild
+      mkdir -p parser/
+      $CC -o parser/tsx.so -I$src/tsx/src $src/tsx/src/parser.c $src/tsx/src/scanner.c -shared  -Os -lstdc++ -fPIC
+      runHook postBuild
+    '';
+  };
+  tree-sitter-go = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "tree-sitter-go-${version}";
+    src = builtins.fetchGit {
+      "url" = "git@github.com:tree-sitter/tree-sitter-go.git";
+      "ref" = "master";
+      "rev" = "34181774b3e86b7801c939c79c7b80a82df91a2b";
+    };
+    buildPhase = ''
+      runHook preBuild
+      mkdir -p parser/
+      $CC -o parser/go.so -I$src/src $src/src/parser.c -shared  -Os -lstdc++ -fPIC
+      runHook postBuild
+    '';
+  };
+  tree-sitter-php = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "tree-sitter-php-${version}";
+    src = builtins.fetchGit {
+      "ref" = "master";
+      "url" = "git@github.com:tree-sitter/tree-sitter-php";
+      "rev" = "b0c0367d4b7058921fdc4ba11e257441a64ab809";
+    };
+    buildPhase = ''
+      runHook preBuild
+      mkdir -p parser/
+      ${pkgs.clang}/bin/clang++ -o parser/php.so -I$src/src $src/src/parser.c $src/src/scanner.cc -shared  -Os -lstdc++ -fPIC
+      runHook postBuild
+    '';
+  };
 
 in {
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball {
+      url = https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz;
+    }))
+  ];
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -55,6 +130,7 @@ in {
     pwgen
     reattach-to-user-namespace
     trash-cli
+    tree-sitter
   ];
 
   home.sessionVariables = {
@@ -137,6 +213,7 @@ in {
 
   programs.neovim = {
     enable = true;
+    package = pkgs.neovim-nightly;
     withNodeJs = true;
     extraConfig = builtins.readFile ./init.vim;
     plugins = [
@@ -151,6 +228,7 @@ in {
       pkgs.vimPlugins.coc-vimlsp
       pkgs.vimPlugins.fzf-vim
       pkgs.vimPlugins.lightline-vim
+      pkgs.vimPlugins.nvim-treesitter
       pkgs.vimPlugins.tmux-navigator
       pkgs.vimPlugins.vim-abolish
       pkgs.vimPlugins.vim-commentary
@@ -162,8 +240,13 @@ in {
       pkgs.vimPlugins.vim-sensible
       pkgs.vimPlugins.vim-surround
       pkgs.vimPlugins.vim-vinegar
+      indentLine
       nvim-miniyank
-      space-vim-theme
+      tree-sitter-go
+      tree-sitter-php
+      tree-sitter-ts
+      tree-sitter-tsx
+      vim-code-dark
       vim-scratch
     ];
   };

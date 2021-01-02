@@ -11,9 +11,13 @@
     syntax sync fromstart
     set redrawtime=20000
 
+    " Invisible characters
+    set list
+    set listchars=tab:\ \ │,trail:·,extends:…,precedes:…
+
     " Themes
     set background=dark
-    colorscheme space_vim_theme
+    colorscheme codedark
 
     " Hide netrw banner
     let g:netrw_banner=0
@@ -44,9 +48,18 @@
 
 " Indention
     filetype plugin indent on
-    set tabstop=2
-    set shiftwidth=2
+    set tabstop=8
+    set shiftwidth=8
     set expandtab
+
+" indentLine
+    let g:indentLine_color_gui = '#373c44'
+    let g:indentLine_char = '│'
+
+    " Don't hide characters like the "**" in "**word**"
+    let g:vim_json_syntax_conceal = 0
+    let g:vim_markdown_conceal = 0
+    let g:vim_markdown_conceal_code_blocks = 0
 
 " Folding
     set foldmethod=indent
@@ -84,6 +97,21 @@
 
 " Allow netrw to remove non-empty local directories
     let g:netrw_rmdir_cmd = 'trash'
+
+" nvim-treesitter
+packadd nvim-treesitter
+    lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = {},     -- one of "all", "language", or a list of languages
+  highlight = {
+    enable = true,              -- false will disable the whole extension
+    disable = {'php'},  -- list of language that will be disabled
+  },
+  indent = {
+    enable = true,
+  },
+}
+EOF
 
 " coc.nvim
     " Update diagnostics every 300 milliseconds.
