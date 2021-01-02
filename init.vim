@@ -90,7 +90,8 @@
     let g:polyglot_disabled = ['jsx'] 
 
 " Prettier
-    command! -nargs=0 Prettier :CocCommand prettier.formatFile
+    " command! -nargs=0 Prettier :CocCommand prettier.formatFile
+    autocmd FileType typescript set formatprg=prettier-eslint\ --stdin
 
 " Make 0 go to first character in line
     map 0 ^
@@ -113,64 +114,127 @@ require'nvim-treesitter.configs'.setup {
 }
 EOF
 
-" coc.nvim
-    " Update diagnostics every 300 milliseconds.
-    set updatetime=300
+" Language server
+    lua <<EOF
+require'lspconfig'.tsserver.setup{}
+require'lspconfig'.diagnosticls.setup{
+    filetypes = { 'typescript' },
+    init_options = {
+        linters = {
+            eslint = {
+                command = './node_modules/.bin/eslint',
+                rootPatterns = { '.git' },
+                debounce = 100,
+                args = { '--stdin', '--stdin-filename', '%filepath', '--format', '--json' },
+                sourceName = 'eslint',
+                parseJson = {
+                    errorsRoot = '[0].messages',
+                    line = 'line',
+                    column = 'column',
+                    endLine = 'endLine',
+                    endColumn = 'endColumn',
+                    message = '[eslint] ${message} [${ruleId}]',
+                    security = 'severity'
+                },
+                securities = {
+                    [2] = 'error',
+                    [1] = 'warning'
+                }
+            }
+        }
+    }
+}
+EOF
 
-    " Use tab for trigger completion with characters ahead and navigate.
-    " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-    inoremap <silent><expr> <TAB>
-          \ pumvisible() ? "\<C-n>" :
-          \ <SID>check_back_space() ? "\<TAB>" :
-          \ coc#refresh()
-    inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+    nnoremap <silent> ]g <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+    nnoremap <silent> [g <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
+    nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
+    nnoremap <silent> K  <cmd>lua vim.lsp.buf.hover()<CR>
+    nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
+    nnoremap <leader>rn  <cmd>lua vim.lsp.buf.rename()<CR>
 
-    function! s:check_back_space() abort
-      let col = col('.') - 1
-      return !col || getline('.')[col - 1]  =~# '\s'
-    endfunction
+" Completion
+    autocmd BufEnter * lua require'completion'.on_attach()
 
-    " Use <c-space> to trigger completion.
-    inoremap <silent><expr> <c-space> coc#refresh()
+    inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-    " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-    " Coc only does snippet and additional edit on confirm.
-    inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+    set completeopt=menuone,noinsert,noselect
+    set shortmess+=c
 
-    " Use `[g` and `]g` to navigate diagnostics
-    nmap <silent> [g <Plug>(coc-diagnostic-prev)
-    nmap <silent> ]g <Plug>(coc-diagnostic-next)
+    let g:completion_chain_complete_list = {
+        \'default' : {
+        \  'default' : [
+        \    {'complete_items' : ['lsp', 'ts', 'snippet']},
+        \    {'mode' : 'file'}
+        \  ],
+        \  'comment' : [],
+        \  'string' : []
+        \  },
+        \'vim' : [
+        \  {'complete_items': ['snippet']},
+        \  {'mode' : 'cmd'}
+        \  ]
+        \}
 
-    " Remap keys for gotos
-    nmap <silent> gd <Plug>(coc-definition)
-    nmap <silent> gr <Plug>(coc-references)
+" " coc.nvim
+"     " Update diagnostics every 300 milliseconds.
+"     set updatetime=300
 
-    " Use K to show documentation in preview window
-    nnoremap <silent> K :call <SID>show_documentation()<CR>
+"     " Use tab for trigger completion with characters ahead and navigate.
+"     " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+"     inoremap <silent><expr> <TAB>
+"           \ pumvisible() ? "\<C-n>" :
+"           \ <SID>check_back_space() ? "\<TAB>" :
+"           \ coc#refresh()
+"     inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-    function! s:show_documentation()
-      if (index(['vim','help'], &filetype) >= 0)
-        execute 'h '.expand('<cword>')
-      else
-        call CocAction('doHover')
-      endif
-    endfunction
+"     function! s:check_back_space() abort
+"       let col = col('.') - 1
+"       return !col || getline('.')[col - 1]  =~# '\s'
+"     endfunction
 
-    " Remap for rename current word
-    nmap <leader>rn <Plug>(coc-rename)
+"     " Use <c-space> to trigger completion.
+"     inoremap <silent><expr> <c-space> coc#refresh()
 
-    " Show all diagnostics
-    nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+"     " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+"     " Coc only does snippet and additional edit on confirm.
+"     inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
-    " Remap for format selected region
-    xmap <leader>f  <Plug>(coc-format-selected)
-    nmap <leader>f  <Plug>(coc-format-selected)
+"     " Use `[g` and `]g` to navigate diagnostics
+"     nmap <silent> [g <Plug>(coc-diagnostic-prev)
+"     nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-    " Run jest for current project
-    command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
+"     " Remap keys for gotos
+"     nmap <silent> gd <Plug>(coc-definition)
+"     nmap <silent> gr <Plug>(coc-references)
 
-    " Run jest for current file
-    command! -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
+"     " Use K to show documentation in preview window
+"     nnoremap <silent> K :call <SID>show_documentation()<CR>
 
-    " Run jest for current test
-    nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
+"     function! s:show_documentation()
+"       if (index(['vim','help'], &filetype) >= 0)
+"         execute 'h '.expand('<cword>')
+"       else
+"         call CocAction('doHover')
+"       endif
+"     endfunction
+
+"     " Remap for rename current word
+"     nmap <leader>rn <Plug>(coc-rename)
+
+"     " Show all diagnostics
+"     nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+
+"     " Remap for format selected region
+"     xmap <leader>f  <Plug>(coc-format-selected)
+"     nmap <leader>f  <Plug>(coc-format-selected)
+
+"     " Run jest for current project
+"     command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
+
+"     " Run jest for current file
+"     command! -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
+
+"     " Run jest for current test
+"     nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>

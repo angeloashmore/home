@@ -127,6 +127,14 @@ in {
     fzf
     gitAndTools.gh
     jetbrains-mono
+    nodePackages.diagnostic-languageserver
+    nodePackages.dockerfile-language-server-nodejs
+    nodePackages.typescript-language-server
+    nodePackages.vim-language-server
+    nodePackages.vscode-css-languageserver-bin
+    nodePackages.vscode-html-languageserver-bin
+    nodePackages.vscode-json-languageserver
+    nodePackages.yaml-language-server
     pwgen
     reattach-to-user-namespace
     trash-cli
@@ -218,16 +226,11 @@ in {
     extraConfig = builtins.readFile ./init.vim;
     plugins = [
       pkgs.vimPlugins.auto-pairs
-      pkgs.vimPlugins.coc-css
-      pkgs.vimPlugins.coc-eslint
-      pkgs.vimPlugins.coc-jest
-      pkgs.vimPlugins.coc-json
-      pkgs.vimPlugins.coc-nvim
-      pkgs.vimPlugins.coc-prettier
-      pkgs.vimPlugins.coc-tsserver
-      pkgs.vimPlugins.coc-vimlsp
+      pkgs.vimPlugins.completion-nvim
+      pkgs.vimPlugins.completion-treesitter
       pkgs.vimPlugins.fzf-vim
       pkgs.vimPlugins.lightline-vim
+      pkgs.vimPlugins.nvim-lspconfig
       pkgs.vimPlugins.nvim-treesitter
       pkgs.vimPlugins.tmux-navigator
       pkgs.vimPlugins.vim-abolish
