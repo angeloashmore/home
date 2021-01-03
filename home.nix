@@ -97,6 +97,17 @@ let
       runHook postBuild
     '';
   };
+  efm-langserver = pkgs.buildGoModule rec {
+    pname = "efm-langserver";
+    version = "0.0.26";
+    src = pkgs.fetchFromGitHub {
+      owner = "mattn";
+      repo = "efm-langserver";
+      rev = "v${version}";
+      sha256 = "0m9cfimjprdj9jvhmc9wgchpy1djq5sdaqk6iphh346w4blwvs5w";
+    };
+    vendorSha256 = "1whifjmdl72kkcb22h9b1zadsrc80prrjiyvyba2n5vb4kavximm";
+  };
 
 in {
   nixpkgs.overlays = [
@@ -124,21 +135,23 @@ in {
   home.stateVersion = "20.09";
 
   home.packages = with pkgs; [
+    efm-langserver
     fzf
     gitAndTools.gh
+    gopls
     jetbrains-mono
-    nodePackages.diagnostic-languageserver
+    pwgen
+    reattach-to-user-namespace
+    trash-cli
+    tree-sitter
     nodePackages.dockerfile-language-server-nodejs
+    nodePackages.eslint_d
     nodePackages.typescript-language-server
     nodePackages.vim-language-server
     nodePackages.vscode-css-languageserver-bin
     nodePackages.vscode-html-languageserver-bin
     nodePackages.vscode-json-languageserver
     nodePackages.yaml-language-server
-    pwgen
-    reattach-to-user-namespace
-    trash-cli
-    tree-sitter
   ];
 
   home.sessionVariables = {

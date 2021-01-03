@@ -19,12 +19,45 @@
     set background=dark
     colorscheme codedark
 
-    " Hide netrw banner
-    let g:netrw_banner=0
+    " Show netrw banner to prevent yank issues
+    let g:netrw_banner=1
 
     " Hide fzf status bar
     autocmd! FileType fzf set laststatus=0 noshowmode noruler
           \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+
+" Indention
+    filetype plugin indent on
+    set tabstop=8
+    set shiftwidth=8
+    set expandtab
+
+" Folding
+    set foldmethod=indent
+    set foldlevelstart=99
+
+" Terminal window movement mappings
+    tnoremap <C-w>h <C-\><C-n><C-w>h
+    tnoremap <C-w>j <C-\><C-n><C-w>j
+    tnoremap <C-w>k <C-\><C-n><C-w>k
+    tnoremap <C-w>l <C-\><C-n><C-w>l
+
+" Make 0 go to first character in line
+    map 0 ^
+
+" Prevent `:Gf` (:Gfetch) when you meant `:GF`
+    command Gf GF
+
+" Language Support
+    let g:jsx_ext_required = 0
+
+    " Set Dockerfile syntax for *.dockerfile
+    au BufRead,BufNewFile *.[Dd]ockerfile setf Dockerfile
+
+    " Syntax highlight Markdown fenced blocks
+    let g:vim_markdown_fenced_languages = ['js', 'bash=sh']
+
+    let g:polyglot_disabled = ['jsx'] 
 
 " lightline
     let g:lightline = {
@@ -37,21 +70,6 @@
       \ },
       \ }
 
-" Terminal window movement mappings
-    tnoremap <C-w>h <C-\><C-n><C-w>h
-    tnoremap <C-w>j <C-\><C-n><C-w>j
-    tnoremap <C-w>k <C-\><C-n><C-w>k
-    tnoremap <C-w>l <C-\><C-n><C-w>l
-
-" Prevent `:Gf` (:Gfetch) when you meant `:GF`
-    command Gf GF
-
-" Indention
-    filetype plugin indent on
-    set tabstop=8
-    set shiftwidth=8
-    set expandtab
-
 " indentLine
     let g:indentLine_color_gui = '#373c44'
     let g:indentLine_char = '│'
@@ -60,10 +78,6 @@
     let g:vim_json_syntax_conceal = 0
     let g:vim_markdown_conceal = 0
     let g:vim_markdown_conceal_code_blocks = 0
-
-" Folding
-    set foldmethod=indent
-    set foldlevelstart=99
 
 " EasyAlign
     " Start interactive EasyAlign in visual mode (e.g. vipga)
@@ -78,80 +92,15 @@
     map <C-p> <Plug>(miniyank-cycle)
     map <C-n> <Plug>(miniyank-cycleback)
 
-" Language Support
-    let g:jsx_ext_required = 0
-
-    " Set Dockerfile syntax for *.dockerfile
-    au BufRead,BufNewFile *.[Dd]ockerfile setf Dockerfile
-
-    " Syntax highlight Markdown fenced blocks
-    let g:vim_markdown_fenced_languages = ['js', 'bash=sh']
-
-    let g:polyglot_disabled = ['jsx'] 
-
-" Prettier
-    " command! -nargs=0 Prettier :CocCommand prettier.formatFile
-    autocmd FileType typescript set formatprg=prettier-eslint\ --stdin
-
-" Make 0 go to first character in line
-    map 0 ^
-
-" Allow netrw to remove non-empty local directories
-    let g:netrw_rmdir_cmd = 'trash'
-
 " nvim-treesitter
-packadd nvim-treesitter
-    lua <<EOF
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = {},     -- one of "all", "language", or a list of languages
-  highlight = {
-    enable = true,              -- false will disable the whole extension
-    disable = {'php'},  -- list of language that will be disabled
-  },
-  indent = {
-    enable = true,
-  },
-}
-EOF
+    packadd nvim-treesitter
 
 " Language server
-    lua <<EOF
-require'lspconfig'.tsserver.setup{}
-require'lspconfig'.diagnosticls.setup{
-    filetypes = { 'typescript' },
-    init_options = {
-        linters = {
-            eslint = {
-                command = './node_modules/.bin/eslint',
-                rootPatterns = { '.git' },
-                debounce = 100,
-                args = { '--stdin', '--stdin-filename', '%filepath', '--format', '--json' },
-                sourceName = 'eslint',
-                parseJson = {
-                    errorsRoot = '[0].messages',
-                    line = 'line',
-                    column = 'column',
-                    endLine = 'endLine',
-                    endColumn = 'endColumn',
-                    message = '[eslint] ${message} [${ruleId}]',
-                    security = 'severity'
-                },
-                securities = {
-                    [2] = 'error',
-                    [1] = 'warning'
-                }
-            }
-        }
-    }
-}
-EOF
+    nnoremap <silent> ]g    <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
+    nnoremap <silent> [g    <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
+    nnoremap <silent> <C-m> <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
 
-    nnoremap <silent> ]g <cmd>lua vim.lsp.diagnostic.goto_next()<CR>
-    nnoremap <silent> [g <cmd>lua vim.lsp.diagnostic.goto_prev()<CR>
-    nnoremap <silent> gd <cmd>lua vim.lsp.buf.definition()<CR>
-    nnoremap <silent> K  <cmd>lua vim.lsp.buf.hover()<CR>
-    nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
-    nnoremap <leader>rn  <cmd>lua vim.lsp.buf.rename()<CR>
+    autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()
 
 " Completion
     autocmd BufEnter * lua require'completion'.on_attach()
@@ -170,71 +119,9 @@ EOF
         \  ],
         \  'comment' : [],
         \  'string' : []
-        \  },
-        \'vim' : [
-        \  {'complete_items': ['snippet']},
-        \  {'mode' : 'cmd'}
-        \  ]
+        \  }
         \}
 
-" " coc.nvim
-"     " Update diagnostics every 300 milliseconds.
-"     set updatetime=300
-
-"     " Use tab for trigger completion with characters ahead and navigate.
-"     " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-"     inoremap <silent><expr> <TAB>
-"           \ pumvisible() ? "\<C-n>" :
-"           \ <SID>check_back_space() ? "\<TAB>" :
-"           \ coc#refresh()
-"     inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-"     function! s:check_back_space() abort
-"       let col = col('.') - 1
-"       return !col || getline('.')[col - 1]  =~# '\s'
-"     endfunction
-
-"     " Use <c-space> to trigger completion.
-"     inoremap <silent><expr> <c-space> coc#refresh()
-
-"     " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-"     " Coc only does snippet and additional edit on confirm.
-"     inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-"     " Use `[g` and `]g` to navigate diagnostics
-"     nmap <silent> [g <Plug>(coc-diagnostic-prev)
-"     nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-"     " Remap keys for gotos
-"     nmap <silent> gd <Plug>(coc-definition)
-"     nmap <silent> gr <Plug>(coc-references)
-
-"     " Use K to show documentation in preview window
-"     nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-"     function! s:show_documentation()
-"       if (index(['vim','help'], &filetype) >= 0)
-"         execute 'h '.expand('<cword>')
-"       else
-"         call CocAction('doHover')
-"       endif
-"     endfunction
-
-"     " Remap for rename current word
-"     nmap <leader>rn <Plug>(coc-rename)
-
-"     " Show all diagnostics
-"     nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
-
-"     " Remap for format selected region
-"     xmap <leader>f  <Plug>(coc-format-selected)
-"     nmap <leader>f  <Plug>(coc-format-selected)
-
-"     " Run jest for current project
-"     command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
-
-"     " Run jest for current file
-"     command! -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
-
-"     " Run jest for current test
-"     nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
+" Lua config
+    lua package.path = os.getenv("HOME") .. "/.config/nixpkgs/lua/?.lua;" .. package.path
+    lua require("init")
