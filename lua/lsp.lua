@@ -106,6 +106,15 @@ local efmTools = {
     lintStdin = true,
     formatCommand = "eslint_d --fix-to-stdout --stdin",
     formatStdin = true
+  },
+  golint = {
+    lintCommand = "golint",
+    lintIgnoreExitCode = true,
+    lintFormats = {"%f:%l:%c: %m"}
+  },
+  gofumpt = {
+    formatCommand = "gofumpt -s",
+    formatStdin = true
   }
 }
 
@@ -123,10 +132,12 @@ lspconfig.efm.setup {
       javascriptreact = {efmTools.prettier, efmTools.eslint},
       yaml = {efmTools.prettier},
       json = {efmTools.prettier},
+      jsonc = {efmTools.prettier},
       html = {efmTools.prettier},
       scss = {efmTools.prettier},
       css = {efmTools.prettier},
       markdown = {efmTools.prettier},
+      go = {efmTools.gofumpt, efmTools.golint}
     },
   },
 }
