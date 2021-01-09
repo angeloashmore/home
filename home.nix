@@ -138,7 +138,10 @@ in {
     efm-langserver
     fzf
     gitAndTools.gh
+    golint
+    gofumpt
     gopls
+    gotools
     jetbrains-mono
     pwgen
     reattach-to-user-namespace
