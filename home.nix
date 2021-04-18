@@ -28,13 +28,13 @@ let
       sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
     };
   };
-  indentLine = pkgs.vimUtils.buildVimPlugin {
-    name = "indentLine";
+  indent-blankline-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "indent-blankline-nvim";
     src = pkgs.fetchFromGitHub {
-      owner = "Yggdroot";
-      repo = "indentLine";
-      rev = "6107214eff0cac5d9810d29ae8614ddfdfcd986b";
-      sha256 = "1aycs427w9w5hjnif5c13wf3jd872a3i94zzdfisfrispbs3ad2m";
+      owner = "lukas-reineke";
+      repo = "indent-blankline.nvim";
+      rev = "6c7ac766ba164af0111457fdb248e7dc96eae7c7";
+      sha256 = "109j1d3q3bgy0zjd8vjj4mk36gwj40qp4av3z4rymavmqbpkwprr";
     };
   };
   tree-sitter-ts = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
@@ -43,7 +43,7 @@ let
     src = builtins.fetchGit {
       "ref" = "master";
       "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "07a12bdf024d66d267bd7f96870f8bbbaceaa5d9";
+      "rev" = "6231a793ef596c4e8162cf569291a28f2169223d";
     };
     buildPhase = ''
       runHook preBuild
@@ -58,7 +58,7 @@ let
     src = builtins.fetchGit {
       "ref" = "master";
       "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "07a12bdf024d66d267bd7f96870f8bbbaceaa5d9";
+      "rev" = "6231a793ef596c4e8162cf569291a28f2169223d";
     };
     buildPhase = ''
       runHook preBuild
@@ -71,9 +71,9 @@ let
     version = "latest";
     name = "tree-sitter-go-${version}";
     src = builtins.fetchGit {
-      "url" = "git@github.com:tree-sitter/tree-sitter-go.git";
       "ref" = "master";
-      "rev" = "34181774b3e86b7801c939c79c7b80a82df91a2b";
+      "url" = "git@github.com:tree-sitter/tree-sitter-go.git";
+      "rev" = "2a83dfdd759a632651f852aa4dc0af2525fae5cd";
     };
     buildPhase = ''
       runHook preBuild
@@ -88,7 +88,7 @@ let
     src = builtins.fetchGit {
       "ref" = "master";
       "url" = "git@github.com:tree-sitter/tree-sitter-php";
-      "rev" = "b0c0367d4b7058921fdc4ba11e257441a64ab809";
+      "rev" = "0d63eaf94e8d6c0694551b016c802787e61b3fb2";
     };
     buildPhase = ''
       runHook preBuild
@@ -121,28 +121,32 @@ in {
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "20.09";
+  home.stateVersion = "21.03";
 
-  home.packages = with pkgs; [
-    fzf
-    gitAndTools.gh
-    jetbrains-mono
-    pwgen
-    reattach-to-user-namespace
-    trash-cli
-    tree-sitter
+  # Extra directories to add to PATH.
+  home.sessionPath = [
+    "/Users/angeloashmore/go/bin"
   ];
 
   home.sessionVariables = {
     EDITOR = "nvim";
   };
 
+  home.packages = with pkgs; [
+    fzf
+    gitAndTools.gh
+    jetbrains-mono
+    jq
+    pwgen
+    reattach-to-user-namespace
+    trash-cli
+    tree-sitter
+  ];
+
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     shellAliases = {
-      cask = "/usr/local/bin/brew cask";
-      brew-bundle = "/usr/local/bin/brew bundle";
       docker = "/usr/local/bin/docker";
       docker-compose = "/usr/local/bin/docker-compose";
       docker-credential-desktop = "/usr/local/bin/docker-credential-desktop";
@@ -217,6 +221,8 @@ in {
     withNodeJs = true;
     extraConfig = builtins.readFile ./init.vim;
     plugins = [
+      indent-blankline-nvim
+      nvim-miniyank
       pkgs.vimPlugins.auto-pairs
       pkgs.vimPlugins.coc-css
       pkgs.vimPlugins.coc-eslint
@@ -224,6 +230,7 @@ in {
       pkgs.vimPlugins.coc-json
       pkgs.vimPlugins.coc-nvim
       pkgs.vimPlugins.coc-prettier
+      pkgs.vimPlugins.coc-snippets
       pkgs.vimPlugins.coc-tsserver
       pkgs.vimPlugins.coc-vimlsp
       pkgs.vimPlugins.fzf-vim
@@ -232,6 +239,7 @@ in {
       pkgs.vimPlugins.tmux-navigator
       pkgs.vimPlugins.vim-abolish
       pkgs.vimPlugins.vim-commentary
+      pkgs.vimPlugins.vim-dispatch
       pkgs.vimPlugins.vim-easy-align
       pkgs.vimPlugins.vim-fugitive
       pkgs.vimPlugins.vim-polyglot
@@ -240,8 +248,7 @@ in {
       pkgs.vimPlugins.vim-sensible
       pkgs.vimPlugins.vim-surround
       pkgs.vimPlugins.vim-vinegar
-      indentLine
-      nvim-miniyank
+      pkgs.vimPlugins.vista-vim
       tree-sitter-go
       tree-sitter-php
       tree-sitter-ts

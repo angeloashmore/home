@@ -43,18 +43,27 @@
     tnoremap <C-w>k <C-\><C-n><C-w>k
     tnoremap <C-w>l <C-\><C-n><C-w>l
 
-" Prevent `:Gf` (:Gfetch) when you meant `:GF`
+" fugitive.vim
+    " Prevent `:Gf` (:Gfetch) when you meant `:GF`
     command Gf GF
+
+" dispatch.vim
+    command! -bang -bar -nargs=* Gpush execute 'Dispatch<bang> -dir=' .
+          \ fnameescape(FugitiveGitDir()) . '/../' 'git push' <q-args>
+    command! -bang -bar -nargs=* Gpull execute 'Dispatch<bang> -dir=' .
+          \ fnameescape(FugitiveGitDir()) . '/../' 'git pull' <q-args>
 
 " Indention
     filetype plugin indent on
-    set tabstop=8
-    set shiftwidth=8
+    set tabstop=2
+    set shiftwidth=2
     set expandtab
 
+    autocmd Filetype go setlocal tabstop=8 shiftwidth=8 expandtab!
+
 " indentLine
-    let g:indentLine_color_gui = '#373c44'
-    let g:indentLine_char = '│'
+    highlight IndentBlanklineChar guifg=#2a2d30 gui=nocombine
+    let g:indent_blankline_char = '│'
 
     " Don't hide characters like the "**" in "**word**"
     let g:vim_json_syntax_conceal = 0
@@ -78,6 +87,13 @@
     map <C-p> <Plug>(miniyank-cycle)
     map <C-n> <Plug>(miniyank-cycleback)
 
+" vista.vim
+    let g:vista_default_executive = 'coc'
+    let g:vista#renderer#enable_icon = 0
+    let g:vista_sidebar_width = 50
+    let g:vista_echo_cursor = 0
+    let g:vista_highlight_whole_line = 1
+
 " Language Support
     let g:jsx_ext_required = 0
 
@@ -87,7 +103,7 @@
     " Syntax highlight Markdown fenced blocks
     let g:vim_markdown_fenced_languages = ['js', 'bash=sh']
 
-    let g:polyglot_disabled = ['jsx'] 
+    let g:polyglot_disabled = ['jsx', 'typescript', 'typescriptreact', 'javascript', 'javascriptreact', 'go']
 
 " Prettier
     command! -nargs=0 Prettier :CocCommand prettier.formatFile
@@ -165,6 +181,16 @@ EOF
     " Remap for format selected region
     xmap <leader>f  <Plug>(coc-format-selected)
     nmap <leader>f  <Plug>(coc-format-selected)
+
+    " Remap <C-f> and <C-b> for scroll float windows/popups.
+    if has('nvim-0.4.0') || has('patch-8.2.0750')
+      nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+      nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+      inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+      inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+      vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+      vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+    endif
 
     " Run jest for current project
     command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
