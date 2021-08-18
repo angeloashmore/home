@@ -19,15 +19,24 @@ let
       sha256 = "1hsq08y68iqmwkscf4zr7lgmw3r6v97gbafj5z0g1flzvb98ly0s";
     };
   };
-  nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
-    name = "nvim-miniyank";
+  vim-yoink = pkgs.vimUtils.buildVimPlugin {
+    name = "vim-yoink";
     src = pkgs.fetchFromGitHub {
-      owner = "bfredl";
-      repo = "nvim-miniyank";
-      rev = "2a3a0f3ae535e1b93a8c17dfdac718b9a12c772b";
-      sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
+      owner = "svermeulen";
+      repo = "vim-yoink";
+      rev = "440d939f1c45a9c9930b87d4c0fa5adf05186362";
+      sha256 = "1qs3dnbz0cv1cmkms35p5bj55rllxdpkz9lw321bf6w3jjzbshz1";
     };
   };
+  # nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
+  #   name = "nvim-miniyank";
+  #   src = pkgs.fetchFromGitHub {
+  #     owner = "bfredl";
+  #     repo = "nvim-miniyank";
+  #     rev = "2a3a0f3ae535e1b93a8c17dfdac718b9a12c772b";
+  #     sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
+  #   };
+  # };
   indent-blankline-nvim = pkgs.vimUtils.buildVimPlugin {
     name = "indent-blankline-nvim";
     src = pkgs.fetchFromGitHub {
@@ -126,6 +135,7 @@ in {
   # Extra directories to add to PATH.
   home.sessionPath = [
     "/Users/angeloashmore/go/bin"
+    "/Users/angeloashmore/.npm-global/bin"
   ];
 
   home.sessionVariables = {
@@ -222,7 +232,6 @@ in {
     extraConfig = builtins.readFile ./init.vim;
     plugins = [
       indent-blankline-nvim
-      nvim-miniyank
       pkgs.vimPlugins.auto-pairs
       pkgs.vimPlugins.coc-css
       pkgs.vimPlugins.coc-eslint
@@ -233,6 +242,7 @@ in {
       pkgs.vimPlugins.coc-snippets
       pkgs.vimPlugins.coc-tsserver
       pkgs.vimPlugins.coc-vimlsp
+      pkgs.vimPlugins.editorconfig-vim
       pkgs.vimPlugins.fzf-vim
       pkgs.vimPlugins.lightline-vim
       pkgs.vimPlugins.nvim-treesitter
@@ -255,6 +265,7 @@ in {
       tree-sitter-tsx
       vim-code-dark
       vim-scratch
+      vim-yoink
     ];
   };
 

@@ -47,6 +47,10 @@
     " Prevent `:Gf` (:Gfetch) when you meant `:GF`
     command Gf GF
 
+" editorconfig-vim
+    " Ensure fugitive.vim is not affected by editorconfig
+    let g:EditorConfig_exclude_patterns = ['fugitive://.*']
+
 " dispatch.vim
     command! -bang -bar -nargs=* Gpush execute 'Dispatch<bang> -dir=' .
           \ fnameescape(FugitiveGitDir()) . '/../' 'git push' <q-args>
@@ -62,7 +66,8 @@
     autocmd Filetype go setlocal tabstop=8 shiftwidth=8 expandtab!
 
 " indentLine
-    highlight IndentBlanklineChar guifg=#2a2d30 gui=nocombine
+    " highlight IndentBlanklineChar guifg=#2a2d30 gui=nocombine
+    highlight IndentBlanklineContextChar guifg=#FF00FF gui=nocombine
     let g:indent_blankline_char = '│'
 
     " Don't hide characters like the "**" in "**word**"
@@ -81,11 +86,16 @@
     " Start interactive EasyAlign for a motion/text object (e.g. gaip)
     nmap ga <Plug>(EasyAlign)
 
-" nvim-miniyank
-    map p <Plug>(miniyank-autoput)
-    map P <Plug>(miniyank-autoPut)
-    map <C-p> <Plug>(miniyank-cycle)
-    map <C-n> <Plug>(miniyank-cycleback)
+" vim-yoink
+    nmap <c-p> <plug>(YoinkPostPasteSwapBack)
+    nmap <c-n> <plug>(YoinkPostPasteSwapForward)
+
+    nmap p <plug>(YoinkPaste_p)
+    nmap P <plug>(YoinkPaste_P)
+
+    " Also replace the default gp with yoink paste so we can toggle paste in this case too
+    nmap gp <plug>(YoinkPaste_gp)
+    nmap gP <plug>(YoinkPaste_gP)
 
 " vista.vim
     let g:vista_default_executive = 'coc'
