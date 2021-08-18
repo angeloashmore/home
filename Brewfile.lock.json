@@ -2,7 +2,7 @@
   "entries": {
     "tap": {
       "homebrew/cask": {
-        "revision": "e59911e86abbd74d20a81858d926df6ab06789fe"
+        "revision": "2bef471b5703753876dd144b1ed059f2a3202e08"
       }
     },
     "cask": {
@@ -34,7 +34,7 @@
         }
       },
       "discord": {
-        "version": "0.0.262",
+        "version": "0.0.263",
         "options": {
           "full_name": "discord",
           "args": {
@@ -43,7 +43,7 @@
         }
       },
       "docker": {
-        "version": "3.3.0,62916",
+        "version": "3.3.3,64133",
         "options": {
           "full_name": "docker",
           "args": {
@@ -52,7 +52,7 @@
         }
       },
       "firefox": {
-        "version": "87.0",
+        "version": "88.0.1",
         "options": {
           "full_name": "firefox",
           "args": {
@@ -61,7 +61,7 @@
         }
       },
       "google-chrome": {
-        "version": "90.0.4430.72",
+        "version": "91.0.4472.77",
         "options": {
           "full_name": "google-chrome",
           "args": {
@@ -79,7 +79,7 @@
         }
       },
       "insomnia": {
-        "version": "2021.2.2",
+        "version": "2021.3.0",
         "options": {
           "full_name": "insomnia",
           "args": {
@@ -88,7 +88,7 @@
         }
       },
       "iterm2": {
-        "version": "3.4.5",
+        "version": "3.4.8",
         "options": {
           "full_name": "iterm2",
           "args": {
@@ -115,7 +115,7 @@
         }
       },
       "rectangle": {
-        "version": "0.45,50",
+        "version": "0.46,51",
         "options": {
           "full_name": "rectangle",
           "args": {
@@ -142,7 +142,7 @@
         }
       },
       "sketch": {
-        "version": "71.2,115329",
+        "version": "72.1,124357",
         "options": {
           "full_name": "sketch",
           "args": {
@@ -160,7 +160,7 @@
         }
       },
       "the-unarchiver": {
-        "version": "4.2.4,131:1605625663",
+        "version": "4.3.0,132:1618399262",
         "options": {
           "full_name": "the-unarchiver",
           "args": {
@@ -178,7 +178,7 @@
         }
       },
       "visual-studio-code": {
-        "version": "1.55.2",
+        "version": "1.56.2",
         "options": {
           "full_name": "visual-studio-code",
           "args": {
@@ -232,7 +232,7 @@
         }
       },
       "cyberduck": {
-        "version": "7.8.5,34493",
+        "version": "7.9.0,34899",
         "options": {
           "full_name": "cyberduck",
           "args": {
@@ -259,7 +259,7 @@
         }
       },
       "slack": {
-        "version": "4.15.0",
+        "version": "4.16.2",
         "options": {
           "full_name": "slack",
           "args": {
@@ -277,7 +277,7 @@
         }
       },
       "zoom": {
-        "version": "5.6.1.560",
+        "version": "5.6.6.950",
         "options": {
           "full_name": "zoom",
           "args": {
@@ -293,17 +293,26 @@
             "appdir": "~/Applications"
           }
         }
+      },
+      "loom": {
+        "version": "0.81.2",
+        "options": {
+          "full_name": "loom",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
       }
     }
   },
   "system": {
     "macos": {
       "catalina": {
-        "HOMEBREW_VERSION": "3.1.2",
+        "HOMEBREW_VERSION": "3.1.9",
         "HOMEBREW_PREFIX": "/usr/local",
-        "Homebrew/homebrew-core": "f351197033df7e6ee9e18de01e25a0def261496d",
+        "Homebrew/homebrew-core": "1c57f67a1af4da5e243724f1c195225fe28a319b",
         "CLT": "12.0.0.0.1.1599194153",
-        "Xcode": "12.0",
+        "Xcode": "12.4",
         "macOS": "10.15.6"
       }
     }
