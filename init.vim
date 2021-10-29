@@ -17,11 +17,10 @@
 
     " Themes
     set background=dark
-    colorscheme codedark
-    let g:zenbones_compat = 1
+    colorscheme melange
 
     " Hide netrw banner
-    " let g:netrw_banner=0
+    let g:netrw_banner=1
 
     " Hide fzf status bar
     autocmd! FileType fzf set laststatus=0 noshowmode noruler
@@ -36,6 +35,7 @@
       \ 'component_function': {
       \   'gitbranch': 'FugitiveHead'
       \ },
+      \ 'colorscheme': 'seoul256',
       \ }
 
 " Terminal window movement mappings
@@ -60,8 +60,8 @@
 
 " Indention
     filetype plugin indent on
-    set tabstop=4
-    set shiftwidth=4
+    set tabstop=8
+    set shiftwidth=8
     set expandtab
 
     autocmd Filetype go setlocal tabstop=8 shiftwidth=8 expandtab!
