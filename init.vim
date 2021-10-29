@@ -18,9 +18,10 @@
     " Themes
     set background=dark
     colorscheme codedark
+    let g:zenbones_compat = 1
 
     " Hide netrw banner
-    let g:netrw_banner=0
+    " let g:netrw_banner=0
 
     " Hide fzf status bar
     autocmd! FileType fzf set laststatus=0 noshowmode noruler
@@ -59,8 +60,8 @@
 
 " Indention
     filetype plugin indent on
-    set tabstop=2
-    set shiftwidth=2
+    set tabstop=4
+    set shiftwidth=4
     set expandtab
 
     autocmd Filetype go setlocal tabstop=8 shiftwidth=8 expandtab!
@@ -69,6 +70,10 @@
     " highlight IndentBlanklineChar guifg=#2a2d30 gui=nocombine
     highlight IndentBlanklineContextChar guifg=#FF00FF gui=nocombine
     let g:indent_blankline_char = '│'
+
+    " Fix UI bug where highlighted line extends past current line
+    set colorcolumn=99999
+
 
     " Don't hide characters like the "**" in "**word**"
     let g:vim_json_syntax_conceal = 0
@@ -86,16 +91,11 @@
     " Start interactive EasyAlign for a motion/text object (e.g. gaip)
     nmap ga <Plug>(EasyAlign)
 
-" vim-yoink
-    nmap <c-p> <plug>(YoinkPostPasteSwapBack)
-    nmap <c-n> <plug>(YoinkPostPasteSwapForward)
-
-    nmap p <plug>(YoinkPaste_p)
-    nmap P <plug>(YoinkPaste_P)
-
-    " Also replace the default gp with yoink paste so we can toggle paste in this case too
-    nmap gp <plug>(YoinkPaste_gp)
-    nmap gP <plug>(YoinkPaste_gP)
+" nvim-miniyank
+    map p <Plug>(miniyank-autoput)
+    map P <Plug>(miniyank-autoPut)
+    map <C-p> <Plug>(miniyank-cycle)
+    map <C-n> <Plug>(miniyank-cycleback)
 
 " vista.vim
     let g:vista_default_executive = 'coc'

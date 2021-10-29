@@ -19,24 +19,15 @@ let
       sha256 = "1hsq08y68iqmwkscf4zr7lgmw3r6v97gbafj5z0g1flzvb98ly0s";
     };
   };
-  vim-yoink = pkgs.vimUtils.buildVimPlugin {
-    name = "vim-yoink";
+  nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
+    name = "nvim-miniyank";
     src = pkgs.fetchFromGitHub {
-      owner = "svermeulen";
-      repo = "vim-yoink";
-      rev = "440d939f1c45a9c9930b87d4c0fa5adf05186362";
-      sha256 = "1qs3dnbz0cv1cmkms35p5bj55rllxdpkz9lw321bf6w3jjzbshz1";
+      owner = "bfredl";
+      repo = "nvim-miniyank";
+      rev = "2a3a0f3ae535e1b93a8c17dfdac718b9a12c772b";
+      sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
     };
   };
-  # nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
-  #   name = "nvim-miniyank";
-  #   src = pkgs.fetchFromGitHub {
-  #     owner = "bfredl";
-  #     repo = "nvim-miniyank";
-  #     rev = "2a3a0f3ae535e1b93a8c17dfdac718b9a12c772b";
-  #     sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
-  #   };
-  # };
   indent-blankline-nvim = pkgs.vimUtils.buildVimPlugin {
     name = "indent-blankline-nvim";
     src = pkgs.fetchFromGitHub {
@@ -52,7 +43,7 @@ let
     src = builtins.fetchGit {
       "ref" = "master";
       "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "6231a793ef596c4e8162cf569291a28f2169223d";
+      "rev" = "11f8f151327e99361c1ff6764599daeef8633615";
     };
     buildPhase = ''
       runHook preBuild
@@ -67,7 +58,7 @@ let
     src = builtins.fetchGit {
       "ref" = "master";
       "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "6231a793ef596c4e8162cf569291a28f2169223d";
+      "rev" = "11f8f151327e99361c1ff6764599daeef8633615";
     };
     buildPhase = ''
       runHook preBuild
@@ -76,44 +67,44 @@ let
       runHook postBuild
     '';
   };
-  tree-sitter-go = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  rose-pine-neovim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
-    name = "tree-sitter-go-${version}";
+    name = "rose-pine-neovim-${version}";
     src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-go.git";
-      "rev" = "2a83dfdd759a632651f852aa4dc0af2525fae5cd";
+      "ref" = "main";
+      "url" = "git@github.com:rose-pine/neovim";
+      "rev" = "e9bf877ded422ce4323980c8347ca8578fe3b408";
     };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      $CC -o parser/go.so -I$src/src $src/src/parser.c -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
   };
-  tree-sitter-php = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  zenbones-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
-    name = "tree-sitter-php-${version}";
+    name = "zenbones-nvim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "main";
+      "url" = "git@github.com:mcchrish/zenbones.nvim";
+      "rev" = "3864ccd9f7547bc98b8258f430ddf03b68772b9b";
+    };
+  };
+  aquarium-vim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "aquarium-vim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "develop";
+      "url" = "git@github.com:FrenzyExists/aquarium-vim";
+      "rev" = "d3658ca5b33dd795b5011db9f14ba57fb9273ad2";
+    };
+  };
+  melange-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "melange-nvim-${version}";
     src = builtins.fetchGit {
       "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-php";
-      "rev" = "0d63eaf94e8d6c0694551b016c802787e61b3fb2";
+      "url" = "git@github.com:savq/melange";
+      "rev" = "a7f6cc493ac525e98bbb93f6ddeefd062da772de";
     };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      ${pkgs.clang}/bin/clang++ -o parser/php.so -I$src/src $src/src/parser.c $src/src/scanner.cc -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
   };
 
 in {
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url = https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz;
-    }))
-  ];
-
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -145,29 +136,18 @@ in {
   home.packages = with pkgs; [
     fzf
     gitAndTools.gh
-    jetbrains-mono
     jq
-    pwgen
     reattach-to-user-namespace
     trash-cli
-    tree-sitter
   ];
 
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    shellAliases = {
-      docker = "/usr/local/bin/docker";
-      docker-compose = "/usr/local/bin/docker-compose";
-      docker-credential-desktop = "/usr/local/bin/docker-credential-desktop";
-      docker-credential-osxkeychain = "/usr/local/bin/docker-credential-desktop";
-    };
     oh-my-zsh = {
       enable = true;
       plugins = [
         "vi-mode"
-        "docker"
-        "docker-compose"
       ];
     };
     plugins = [
@@ -227,11 +207,11 @@ in {
 
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-nightly;
     withNodeJs = true;
     extraConfig = builtins.readFile ./init.vim;
     plugins = [
       indent-blankline-nvim
+      nvim-miniyank
       pkgs.vimPlugins.auto-pairs
       pkgs.vimPlugins.coc-css
       pkgs.vimPlugins.coc-eslint
@@ -258,14 +238,16 @@ in {
       pkgs.vimPlugins.vim-sensible
       pkgs.vimPlugins.vim-surround
       pkgs.vimPlugins.vim-vinegar
+      pkgs.vimPlugins.lush-nvim
       pkgs.vimPlugins.vista-vim
-      tree-sitter-go
-      tree-sitter-php
       tree-sitter-ts
       tree-sitter-tsx
       vim-code-dark
       vim-scratch
-      vim-yoink
+      rose-pine-neovim
+      zenbones-nvim
+      aquarium-vim
+      melange-nvim
     ];
   };
 
