@@ -17,10 +17,11 @@
 
     " Themes
     set background=dark
-    colorscheme melange
+    let g:rose_pine_variant = "moon"
+    colorscheme rose-pine
 
     " Hide netrw banner
-    let g:netrw_banner=1
+    let g:netrw_banner=0
 
     " Hide fzf status bar
     autocmd! FileType fzf set laststatus=0 noshowmode noruler
@@ -35,7 +36,7 @@
       \ 'component_function': {
       \   'gitbranch': 'FugitiveHead'
       \ },
-      \ 'colorscheme': 'seoul256',
+      \ 'colorscheme': 'nord',
       \ }
 
 " Terminal window movement mappings
@@ -61,7 +62,6 @@
 " Indention
     filetype plugin indent on
     set tabstop=8
-    set shiftwidth=8
     set expandtab
 
     autocmd Filetype go setlocal tabstop=8 shiftwidth=8 expandtab!

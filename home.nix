@@ -10,15 +10,6 @@ let
       sha256 = "02223q6gazr6hb827gc6hq8sbhjk87r232ji60rbjl3qhcim9bdg";
     };
   };
-  vim-code-dark = pkgs.vimUtils.buildVimPlugin {
-    name = "vim-code-dark";
-    src = pkgs.fetchFromGitHub {
-      owner = "tomasiser";
-      repo = "vim-code-dark";
-      rev = "9a76050073754a8ccc57cc0c1c51aa4328b00097";
-      sha256 = "1hsq08y68iqmwkscf4zr7lgmw3r6v97gbafj5z0g1flzvb98ly0s";
-    };
-  };
   nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
     name = "nvim-miniyank";
     src = pkgs.fetchFromGitHub {
@@ -37,61 +28,13 @@ let
       sha256 = "109j1d3q3bgy0zjd8vjj4mk36gwj40qp4av3z4rymavmqbpkwprr";
     };
   };
-  tree-sitter-ts = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "tree-sitter-ts-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "11f8f151327e99361c1ff6764599daeef8633615";
-    };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      $CC -o parser/typescript.so -I$src/typescript/src $src/typescript/src/parser.c $src/typescript/src/scanner.c -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
-  };
-  tree-sitter-tsx = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "tree-sitter-tsx-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "11f8f151327e99361c1ff6764599daeef8633615";
-    };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      $CC -o parser/tsx.so -I$src/tsx/src $src/tsx/src/parser.c $src/tsx/src/scanner.c -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
-  };
-  rose-pine-neovim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "rose-pine-neovim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:rose-pine/neovim";
-      "rev" = "e9bf877ded422ce4323980c8347ca8578fe3b408";
-    };
-  };
-  zenbones-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "zenbones-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:mcchrish/zenbones.nvim";
-      "rev" = "3864ccd9f7547bc98b8258f430ddf03b68772b9b";
-    };
-  };
-  aquarium-vim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "aquarium-vim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "develop";
-      "url" = "git@github.com:FrenzyExists/aquarium-vim";
-      "rev" = "d3658ca5b33dd795b5011db9f14ba57fb9273ad2";
+  vim-code-dark = pkgs.vimUtils.buildVimPlugin {
+    name = "vim-code-dark";
+    src = pkgs.fetchFromGitHub {
+      owner = "tomasiser";
+      repo = "vim-code-dark";
+      rev = "9a76050073754a8ccc57cc0c1c51aa4328b00097";
+      sha256 = "1hsq08y68iqmwkscf4zr7lgmw3r6v97gbafj5z0g1flzvb98ly0s";
     };
   };
   melange-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
@@ -101,6 +44,42 @@ let
       "ref" = "master";
       "url" = "git@github.com:savq/melange";
       "rev" = "a7f6cc493ac525e98bbb93f6ddeefd062da772de";
+    };
+  };
+  zenbones-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "zenbones-nvim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "main";
+      "url" = "git@github.com:mcchrish/zenbones.nvim";
+      "rev" = "817c9f62c0e4270d3de5361f7c435783d5f77df1";
+    };
+  };
+  rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "rose-pine-${version}";
+    src = builtins.fetchGit {
+      "ref" = "main";
+      "url" = "git@github.com:rose-pine/neovim";
+      "rev" = "adec84ec3d0b7d867a28b3545013bc7da2946db5";
+    };
+  };
+  darkula-vim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "darkula-vim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "master";
+      "url" = "git@github.com:jcorbin/darkula";
+      "rev" = "56c13b66ce8ebb4a04dd282d4e227b81fdc43270";
+    };
+  };
+  uwu-vim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "uwu-vim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "main";
+      "url" = "git@github.com:Mangeshrex/uwu.vim";
+      "rev" = "2b91dd9f817b3fba898b51492c404f136e11576c";
     };
   };
 
@@ -134,11 +113,13 @@ in {
   };
 
   home.packages = with pkgs; [
+    clang_12
     fzf
     gitAndTools.gh
     jq
     reattach-to-user-namespace
     trash-cli
+    watchman
   ];
 
   programs.zsh = {
@@ -213,18 +194,11 @@ in {
       indent-blankline-nvim
       nvim-miniyank
       pkgs.vimPlugins.auto-pairs
-      pkgs.vimPlugins.coc-css
-      pkgs.vimPlugins.coc-eslint
-      pkgs.vimPlugins.coc-jest
-      pkgs.vimPlugins.coc-json
       pkgs.vimPlugins.coc-nvim
-      pkgs.vimPlugins.coc-prettier
-      pkgs.vimPlugins.coc-snippets
-      pkgs.vimPlugins.coc-tsserver
-      pkgs.vimPlugins.coc-vimlsp
       pkgs.vimPlugins.editorconfig-vim
       pkgs.vimPlugins.fzf-vim
       pkgs.vimPlugins.lightline-vim
+      pkgs.vimPlugins.lush-nvim
       pkgs.vimPlugins.nvim-treesitter
       pkgs.vimPlugins.tmux-navigator
       pkgs.vimPlugins.vim-abolish
@@ -238,16 +212,9 @@ in {
       pkgs.vimPlugins.vim-sensible
       pkgs.vimPlugins.vim-surround
       pkgs.vimPlugins.vim-vinegar
-      pkgs.vimPlugins.lush-nvim
       pkgs.vimPlugins.vista-vim
-      tree-sitter-ts
-      tree-sitter-tsx
-      vim-code-dark
+      rose-pine
       vim-scratch
-      rose-pine-neovim
-      zenbones-nvim
-      aquarium-vim
-      melange-nvim
     ];
   };
 
