@@ -10,33 +10,15 @@ let
       sha256 = "02223q6gazr6hb827gc6hq8sbhjk87r232ji60rbjl3qhcim9bdg";
     };
   };
-  vim-code-dark = pkgs.vimUtils.buildVimPlugin {
-    name = "vim-code-dark";
+  nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
+    name = "nvim-miniyank";
     src = pkgs.fetchFromGitHub {
-      owner = "tomasiser";
-      repo = "vim-code-dark";
-      rev = "9a76050073754a8ccc57cc0c1c51aa4328b00097";
-      sha256 = "1hsq08y68iqmwkscf4zr7lgmw3r6v97gbafj5z0g1flzvb98ly0s";
+      owner = "bfredl";
+      repo = "nvim-miniyank";
+      rev = "2a3a0f3ae535e1b93a8c17dfdac718b9a12c772b";
+      sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
     };
   };
-  vim-yoink = pkgs.vimUtils.buildVimPlugin {
-    name = "vim-yoink";
-    src = pkgs.fetchFromGitHub {
-      owner = "svermeulen";
-      repo = "vim-yoink";
-      rev = "440d939f1c45a9c9930b87d4c0fa5adf05186362";
-      sha256 = "1qs3dnbz0cv1cmkms35p5bj55rllxdpkz9lw321bf6w3jjzbshz1";
-    };
-  };
-  # nvim-miniyank = pkgs.vimUtils.buildVimPlugin {
-  #   name = "nvim-miniyank";
-  #   src = pkgs.fetchFromGitHub {
-  #     owner = "bfredl";
-  #     repo = "nvim-miniyank";
-  #     rev = "2a3a0f3ae535e1b93a8c17dfdac718b9a12c772b";
-  #     sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
-  #   };
-  # };
   indent-blankline-nvim = pkgs.vimUtils.buildVimPlugin {
     name = "indent-blankline-nvim";
     src = pkgs.fetchFromGitHub {
@@ -46,74 +28,17 @@ let
       sha256 = "109j1d3q3bgy0zjd8vjj4mk36gwj40qp4av3z4rymavmqbpkwprr";
     };
   };
-  tree-sitter-ts = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
-    name = "tree-sitter-ts-${version}";
+    name = "rose-pine-${version}";
     src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "6231a793ef596c4e8162cf569291a28f2169223d";
+      "ref" = "main";
+      "url" = "git@github.com:rose-pine/neovim";
+      "rev" = "adec84ec3d0b7d867a28b3545013bc7da2946db5";
     };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      $CC -o parser/typescript.so -I$src/typescript/src $src/typescript/src/parser.c $src/typescript/src/scanner.c -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
-  };
-  tree-sitter-tsx = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "tree-sitter-tsx-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-typescript";
-      "rev" = "6231a793ef596c4e8162cf569291a28f2169223d";
-    };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      $CC -o parser/tsx.so -I$src/tsx/src $src/tsx/src/parser.c $src/tsx/src/scanner.c -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
-  };
-  tree-sitter-go = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "tree-sitter-go-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-go.git";
-      "rev" = "2a83dfdd759a632651f852aa4dc0af2525fae5cd";
-    };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      $CC -o parser/go.so -I$src/src $src/src/parser.c -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
-  };
-  tree-sitter-php = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "tree-sitter-php-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:tree-sitter/tree-sitter-php";
-      "rev" = "0d63eaf94e8d6c0694551b016c802787e61b3fb2";
-    };
-    buildPhase = ''
-      runHook preBuild
-      mkdir -p parser/
-      ${pkgs.clang}/bin/clang++ -o parser/php.so -I$src/src $src/src/parser.c $src/src/scanner.cc -shared  -Os -lstdc++ -fPIC
-      runHook postBuild
-    '';
   };
 
 in {
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url = https://github.com/nix-community/neovim-nightly-overlay/archive/master.tar.gz;
-    }))
-  ];
-
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -143,31 +68,22 @@ in {
   };
 
   home.packages = with pkgs; [
+    clang_12
     fzf
     gitAndTools.gh
-    jetbrains-mono
     jq
-    pwgen
     reattach-to-user-namespace
     trash-cli
-    tree-sitter
+    watchman
   ];
 
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    shellAliases = {
-      docker = "/usr/local/bin/docker";
-      docker-compose = "/usr/local/bin/docker-compose";
-      docker-credential-desktop = "/usr/local/bin/docker-credential-desktop";
-      docker-credential-osxkeychain = "/usr/local/bin/docker-credential-desktop";
-    };
     oh-my-zsh = {
       enable = true;
       plugins = [
         "vi-mode"
-        "docker"
-        "docker-compose"
       ];
     };
     plugins = [
@@ -193,12 +109,11 @@ in {
       }
     ];
     envExtra = ''
-      export FZF_DEFAULT_OPTS='
-       --color=fg:#b2b2b2,bg:#292b2e,hl:#4f97d7
-       --color=fg+:#e5e5e5,bg+:#444155,hl+:#bc6ec5
-       --color=info:#2d9574,prompt:#b2b2b2,pointer:#bc6ec5
-       --color=marker:#B1951D,spinner:#43505c,header:#43505c
-      '
+      export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
+       --color=fg:#e0def4,bg:#2a273f,hl:#6e6a86
+       --color=fg+:#908caa,bg+:#232136,hl+:#908caa
+       --color=info:#9ccfd8,prompt:#f6c177,pointer:#c4a7e7
+       --color=marker:#ea9a97,spinner:#eb6f92,header:#ea9a97"
     '';
     initExtraBeforeCompInit = ''
       if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
@@ -227,24 +142,17 @@ in {
 
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-nightly;
     withNodeJs = true;
     extraConfig = builtins.readFile ./init.vim;
     plugins = [
       indent-blankline-nvim
+      nvim-miniyank
       pkgs.vimPlugins.auto-pairs
-      pkgs.vimPlugins.coc-css
-      pkgs.vimPlugins.coc-eslint
-      pkgs.vimPlugins.coc-jest
-      pkgs.vimPlugins.coc-json
       pkgs.vimPlugins.coc-nvim
-      pkgs.vimPlugins.coc-prettier
-      pkgs.vimPlugins.coc-snippets
-      pkgs.vimPlugins.coc-tsserver
-      pkgs.vimPlugins.coc-vimlsp
       pkgs.vimPlugins.editorconfig-vim
       pkgs.vimPlugins.fzf-vim
       pkgs.vimPlugins.lightline-vim
+      pkgs.vimPlugins.lush-nvim
       pkgs.vimPlugins.nvim-treesitter
       pkgs.vimPlugins.tmux-navigator
       pkgs.vimPlugins.vim-abolish
@@ -259,13 +167,8 @@ in {
       pkgs.vimPlugins.vim-surround
       pkgs.vimPlugins.vim-vinegar
       pkgs.vimPlugins.vista-vim
-      tree-sitter-go
-      tree-sitter-php
-      tree-sitter-ts
-      tree-sitter-tsx
-      vim-code-dark
+      rose-pine
       vim-scratch
-      vim-yoink
     ];
   };
 
