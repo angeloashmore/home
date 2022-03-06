@@ -28,33 +28,6 @@ let
       sha256 = "109j1d3q3bgy0zjd8vjj4mk36gwj40qp4av3z4rymavmqbpkwprr";
     };
   };
-  vim-code-dark = pkgs.vimUtils.buildVimPlugin {
-    name = "vim-code-dark";
-    src = pkgs.fetchFromGitHub {
-      owner = "tomasiser";
-      repo = "vim-code-dark";
-      rev = "9a76050073754a8ccc57cc0c1c51aa4328b00097";
-      sha256 = "1hsq08y68iqmwkscf4zr7lgmw3r6v97gbafj5z0g1flzvb98ly0s";
-    };
-  };
-  melange-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "melange-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:savq/melange";
-      "rev" = "a7f6cc493ac525e98bbb93f6ddeefd062da772de";
-    };
-  };
-  zenbones-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "zenbones-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:mcchrish/zenbones.nvim";
-      "rev" = "817c9f62c0e4270d3de5361f7c435783d5f77df1";
-    };
-  };
   rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
     name = "rose-pine-${version}";
@@ -62,24 +35,6 @@ let
       "ref" = "main";
       "url" = "git@github.com:rose-pine/neovim";
       "rev" = "adec84ec3d0b7d867a28b3545013bc7da2946db5";
-    };
-  };
-  darkula-vim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "darkula-vim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:jcorbin/darkula";
-      "rev" = "56c13b66ce8ebb4a04dd282d4e227b81fdc43270";
-    };
-  };
-  uwu-vim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "uwu-vim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:Mangeshrex/uwu.vim";
-      "rev" = "2b91dd9f817b3fba898b51492c404f136e11576c";
     };
   };
 
@@ -154,12 +109,11 @@ in {
       }
     ];
     envExtra = ''
-      export FZF_DEFAULT_OPTS='
-       --color=fg:#b2b2b2,bg:#292b2e,hl:#4f97d7
-       --color=fg+:#e5e5e5,bg+:#444155,hl+:#bc6ec5
-       --color=info:#2d9574,prompt:#b2b2b2,pointer:#bc6ec5
-       --color=marker:#B1951D,spinner:#43505c,header:#43505c
-      '
+      export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
+       --color=fg:#e0def4,bg:#2a273f,hl:#6e6a86
+       --color=fg+:#908caa,bg+:#232136,hl+:#908caa
+       --color=info:#9ccfd8,prompt:#f6c177,pointer:#c4a7e7
+       --color=marker:#ea9a97,spinner:#eb6f92,header:#ea9a97"
     '';
     initExtraBeforeCompInit = ''
       if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
