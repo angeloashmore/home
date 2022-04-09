@@ -104,6 +104,10 @@
     let g:vista_echo_cursor = 0
     let g:vista_highlight_whole_line = 1
 
+" vim-vinegar
+    " Hide .DS_Store files
+    set wildignore+=.DS_Store
+
 " Language Support
     let g:jsx_ext_required = 0
 
