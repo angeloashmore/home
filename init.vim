@@ -210,3 +210,6 @@ EOF
 
     " Run jest for current test
     nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
+
+    " Treat markdown.mdx files as mdx
+    let g:coc_filetype_map = { 'markdown.mdx': 'mdx' }
