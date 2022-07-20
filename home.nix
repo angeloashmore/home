@@ -19,13 +19,13 @@ let
       sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
     };
   };
-  indent-blankline-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "indent-blankline-nvim";
-    src = pkgs.fetchFromGitHub {
-      owner = "lukas-reineke";
-      repo = "indent-blankline.nvim";
-      rev = "6c7ac766ba164af0111457fdb248e7dc96eae7c7";
-      sha256 = "109j1d3q3bgy0zjd8vjj4mk36gwj40qp4av3z4rymavmqbpkwprr";
+  indent-blankline-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "indent-blankline-nvim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "master";
+      "url" = "git@github.com:lukas-reineke/indent-blankline.nvim";
+      "rev" = "045d9582094b27f5ae04d8b635c6da8e97e53f1d";
     };
   };
   rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
@@ -34,7 +34,7 @@ let
     src = builtins.fetchGit {
       "ref" = "main";
       "url" = "git@github.com:rose-pine/neovim";
-      "rev" = "adec84ec3d0b7d867a28b3545013bc7da2946db5";
+      "rev" = "40c4fd7f5551710e388e0df85bb43d6e1627ca80";
     };
   };
 
@@ -59,6 +59,7 @@ in {
 
   # Extra directories to add to PATH.
   home.sessionPath = [
+    "/opt/homebrew/bin"
     "/Users/angeloashmore/go/bin"
     "/Users/angeloashmore/.npm-global/bin"
   ];
@@ -110,10 +111,10 @@ in {
     ];
     envExtra = ''
       export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS"
-       --color=fg:#e0def4,bg:#2a273f,hl:#6e6a86
-       --color=fg+:#908caa,bg+:#232136,hl+:#908caa
+       --color=fg:#e0def4,bg:#1f1d2e,hl:#6e6a86
+       --color=fg+:#908caa,bg+:#191724,hl+:#908caa
        --color=info:#9ccfd8,prompt:#f6c177,pointer:#c4a7e7
-       --color=marker:#ea9a97,spinner:#eb6f92,header:#ea9a97"
+       --color=marker:#ebbcba,spinner:#eb6f92,header:#ebbcba"
     '';
     initExtraBeforeCompInit = ''
       if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
