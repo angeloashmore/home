@@ -61,6 +61,7 @@ in {
   home.sessionPath = [
     "/Users/angeloashmore/go/bin"
     "/Users/angeloashmore/.npm-global/bin"
+    "/opt/homebrew/bin"
   ];
 
   home.sessionVariables = {
