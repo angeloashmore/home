@@ -13,11 +13,11 @@
 
     " Invisible characters
     set list
-    set listchars=tab:\ \ │,trail:·,extends:…,precedes:…
+    set listchars=tab:\ \ ,trail:·,extends:…,precedes:…
 
     " Themes
     set background=dark
-    let g:rose_pine_variant = "moon"
+    " let g:rose_pine_variant = "moon"
     colorscheme rose-pine
 
     " Hide netrw banner
@@ -67,13 +67,10 @@
     autocmd Filetype go setlocal tabstop=8 shiftwidth=8 expandtab!
 
 " indentLine
-    " highlight IndentBlanklineChar guifg=#2a2d30 gui=nocombine
-    highlight IndentBlanklineContextChar guifg=#FF00FF gui=nocombine
     let g:indent_blankline_char = '│'
 
     " Fix UI bug where highlighted line extends past current line
     set colorcolumn=99999
-
 
     " Don't hide characters like the "**" in "**word**"
     let g:vim_json_syntax_conceal = 0
@@ -210,3 +207,6 @@ EOF
 
     " Run jest for current test
     nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
+
+    " Treat markdown.mdx files as mdx
+    let g:coc_filetype_map = { 'markdown.mdx': 'mdx' }
