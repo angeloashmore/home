@@ -116,6 +116,11 @@ in {
        --color=info:#9ccfd8,prompt:#f6c177,pointer:#c4a7e7
        --color=marker:#ebbcba,spinner:#eb6f92,header:#ebbcba"
     '';
+    initExtra = ''
+      if [ -e "$HOME/.config/nixpkgs/secrets.sh" ]; then
+        source "$HOME/.config/nixpkgs/secrets.sh"
+      fi
+    '';
     initExtraBeforeCompInit = ''
       if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
         . "$HOME/.nix-profile/etc/profile.d/nix.sh"
