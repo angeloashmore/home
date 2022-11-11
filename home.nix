@@ -217,6 +217,15 @@ let
       "rev" = "e65a63858771db3f086c8d904ff5f80705fd962b";
     };
   };
+  arial-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "arial-nvim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "master";
+      "url" = "git@github.com:stevearc/aerial.nvim";
+      "rev" = "159041f5f6e0ba914221f097886f1d31ce419c04";
+    };
+  };
   rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
     name = "rose-pine-${version}";
@@ -224,6 +233,15 @@ let
       "ref" = "main";
       "url" = "git@github.com:rose-pine/neovim";
       "rev" = "40c4fd7f5551710e388e0df85bb43d6e1627ca80";
+    };
+  };
+  oh-lucy-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "oh-lucy-nvim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "main";
+      "url" = "git@github.com:Yazeed1s/oh-lucy.nvim";
+      "rev" = "f20cf20d522cdb919a36bce265ab425b05fc2065";
     };
   };
 
@@ -271,7 +289,7 @@ in {
     nodePackages.typescript-language-server
     stylua
     nodePackages.eslint_d
-    nodePackages.prettier_d_slim
+    nodePackages.prettier
     nodePackages.vscode-langservers-extracted
     nodePackages.typescript
   ];
@@ -377,6 +395,8 @@ in {
       editorconfig-nvim
       lsp_signature-nvim
       scratch-vim
+      arial-nvim
+      oh-lucy-nvim
     # nvim-miniyank
     # pkgs.vimPlugins.auto-pairs
     # # pkgs.vimPlugins.coc-nvim

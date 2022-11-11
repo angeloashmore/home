@@ -1,3 +1,4 @@
+require("config-aerial")
 require("config-autopairs")
 require("config-cmp")
 require("config-comment")
@@ -39,6 +40,9 @@ vim.opt.filetype.plugin = "on"
 vim.opt.filetype.indent = "on"
 vim.opt.tabstop = 8
 vim.opt.expandtab = true
+
+-- Disable mouse
+vim.opt.mouse = ""
 
 -- Fix UI bug where highlighted line extends past current line
 vim.opt.colorcolumn = "99999"
