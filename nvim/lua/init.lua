@@ -1,4 +1,5 @@
 require("config-aerial")
+require("config-auto-session")
 require("config-autopairs")
 require("config-cmp")
 require("config-comment")
@@ -29,10 +30,7 @@ vim.opt.listchars = "tab:  ,trail:·,extends:…,precedes:…"
 
 -- Colorscheme
 vim.opt.background = "dark"
-vim.cmd([[colorscheme rose-pine]])
-
--- Hide netrw banner
-vim.g.netrw_banner = 0
+vim.cmd([[colorscheme oh-lucy]])
 
 -- Indention
 vim.opt.filetype = "on"

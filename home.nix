@@ -226,6 +226,15 @@ let
       "rev" = "159041f5f6e0ba914221f097886f1d31ce419c04";
     };
   };
+  auto-session = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "auto-session-${version}";
+    src = builtins.fetchGit {
+      "ref" = "main";
+      "url" = "git@github.com:rmagatti/auto-session";
+      "rev" = "609c952a50ff1d415d79323364e934eba607fce0";
+    };
+  };
   rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
     name = "rose-pine-${version}";
@@ -397,6 +406,7 @@ in {
       scratch-vim
       arial-nvim
       oh-lucy-nvim
+      auto-session
     # nvim-miniyank
     # pkgs.vimPlugins.auto-pairs
     # # pkgs.vimPlugins.coc-nvim
