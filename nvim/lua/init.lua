@@ -29,7 +29,6 @@ vim.opt.list = true
 vim.opt.listchars = "tab:  ,trail:·,extends:…,precedes:…"
 
 -- Colorscheme
-vim.opt.background = "dark"
 vim.cmd([[colorscheme oh-lucy]])
 
 -- Indention

@@ -19,7 +19,7 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, opts)
 
 local default_config = {
-	capabilities = require("cmp_nvim_lsp").default_capabilities(),
+	-- capabilities = require("cmp_nvim_lsp").default_capabilities(),
 	on_attach = on_attach,
 }
 
@@ -58,6 +58,12 @@ require("lspconfig").jsonls.setup({
 	},
 })
 
+require("lspconfig").graphql.setup({
+	filetypes = { "graphql", "typescript", "typescriptreact", "javascript", "javascriptreact" },
+})
+
 require("lspconfig").tsserver.setup({})
 require("lspconfig").cssls.setup({})
 require("lspconfig").html.setup({})
+require("lspconfig").astro.setup({})
+require("lspconfig").svelte.setup({})

@@ -19,15 +19,15 @@ let
   #     sha256 = "0ql1jb97d3zyk33cbq96b3l8p590kdcbbnwmpn81bswi8vpa8fc8";
   #   };
   # };
-  plenary-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "plenary-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:nvim-lua/plenary.nvim";
-      "rev" = "4b7e52044bbb84242158d977a50c4cbcd85070c7";
-    };
-  };
+  # plenary-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "plenary-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:nvim-lua/plenary.nvim";
+  #     "rev" = "4b7e52044bbb84242158d977a50c4cbcd85070c7";
+  #   };
+  # };
   scratch-vim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
     name = "scratch-vim-${version}";
@@ -46,123 +46,123 @@ let
       "rev" = "39bef9fe84af59499cdb88d8e8fb69f3175e1265";
     };
   };
-  indent-blankline-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "indent-blankline-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:lukas-reineke/indent-blankline.nvim";
-      "rev" = "db7cbcb40cc00fc5d6074d7569fb37197705e7f6";
-    };
-  };
-  nvim-surround = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "nvim-surround-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:kylechui/nvim-surround";
-      "rev" = "81f672ad6525b5d8cc27bc6ff84636cc12664485";
-    };
-  };
-  comment-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "comment-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:numToStr/Comment.nvim";
-      "rev" = "ad7ffa8ed2279f1c8a90212c7d3851f9b783a3d6";
-    };
-  };
-  nvim-ts-context-commentstring = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "nvim-ts-context-commentstring-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:JoosepAlviste/nvim-ts-context-commentstring";
-      "rev" = "2941f0064874b33e93d3a794a8a4e99f5f6ece56";
-    };
-  };
-  nvim-autopairs = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "nvim-autopairs-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:windwp/nvim-autopairs";
-      "rev" = "4fc96c8f3df89b6d23e5092d31c866c53a346347";
-    };
-  };
-  nvim-lspconfig = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "nvim-lspconfig-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:neovim/nvim-lspconfig";
-      "rev" = "35a731bddaf20be0a2a0492cfa489ae6130a4eb6";
-    };
-  };
-  nvim-cmp = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "nvim-cmp-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:hrsh7th/nvim-cmp";
-      "rev" = "3347dd3c59b6c62288d861ddb92b9ba1227257a8";
-    };
-  };
-  cmp-nvim-lsp = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "cmp-nvim-lsp-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:hrsh7th/cmp-nvim-lsp";
-      "rev" = "3cf38d9c957e95c397b66f91967758b31be4abe6";
-    };
-  };
-  cmp-nvim-lua = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "cmp-nvim-lua-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:hrsh7th/cmp-nvim-lua";
-      "rev" = "d276254e7198ab7d00f117e88e223b4bd8c02d21";
-    };
-  };
-  luasnip = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "luasnip-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:L3MON4D3/LuaSnip";
-      "rev" = "663d54482b11bca1ce94f56993b9f6ab485a13dc";
-    };
-  };
-  cmp_luasnip = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "cmp_luasnip-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:saadparwaiz1/cmp_luasnip";
-      "rev" = "a9de941bcbda508d0a45d28ae366bb3f08db2e36";
-    };
-  };
-  cmp-path = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "cmp-path-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:hrsh7th/cmp-path";
-      "rev" = "91ff86cd9c29299a64f968ebb45846c485725f23";
-    };
-  };
-  null-ls-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "null-ls-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:jose-elias-alvarez/null-ls.nvim";
-      "rev" = "643c67a296711ff40f1a4d1bec232fa20b179b90";
-    };
-  };
+  # indent-blankline-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "indent-blankline-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:lukas-reineke/indent-blankline.nvim";
+  #     "rev" = "db7cbcb40cc00fc5d6074d7569fb37197705e7f6";
+  #   };
+  # };
+  # nvim-surround = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "nvim-surround-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:kylechui/nvim-surround";
+  #     "rev" = "81f672ad6525b5d8cc27bc6ff84636cc12664485";
+  #   };
+  # };
+  # comment-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "comment-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:numToStr/Comment.nvim";
+  #     "rev" = "ad7ffa8ed2279f1c8a90212c7d3851f9b783a3d6";
+  #   };
+  # };
+  # nvim-ts-context-commentstring = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "nvim-ts-context-commentstring-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:JoosepAlviste/nvim-ts-context-commentstring";
+  #     "rev" = "2941f0064874b33e93d3a794a8a4e99f5f6ece56";
+  #   };
+  # };
+  # nvim-autopairs = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "nvim-autopairs-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:windwp/nvim-autopairs";
+  #     "rev" = "4fc96c8f3df89b6d23e5092d31c866c53a346347";
+  #   };
+  # };
+  # nvim-lspconfig = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "nvim-lspconfig-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:neovim/nvim-lspconfig";
+  #     "rev" = "35a731bddaf20be0a2a0492cfa489ae6130a4eb6";
+  #   };
+  # };
+  # nvim-cmp = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "nvim-cmp-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:hrsh7th/nvim-cmp";
+  #     "rev" = "3347dd3c59b6c62288d861ddb92b9ba1227257a8";
+  #   };
+  # };
+  # cmp-nvim-lsp = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "cmp-nvim-lsp-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:hrsh7th/cmp-nvim-lsp";
+  #     "rev" = "3cf38d9c957e95c397b66f91967758b31be4abe6";
+  #   };
+  # };
+  # cmp-nvim-lua = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "cmp-nvim-lua-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:hrsh7th/cmp-nvim-lua";
+  #     "rev" = "d276254e7198ab7d00f117e88e223b4bd8c02d21";
+  #   };
+  # };
+  # luasnip = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "luasnip-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:L3MON4D3/LuaSnip";
+  #     "rev" = "663d54482b11bca1ce94f56993b9f6ab485a13dc";
+  #   };
+  # };
+  # cmp_luasnip = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "cmp_luasnip-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:saadparwaiz1/cmp_luasnip";
+  #     "rev" = "a9de941bcbda508d0a45d28ae366bb3f08db2e36";
+  #   };
+  # };
+  # cmp-path = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "cmp-path-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:hrsh7th/cmp-path";
+  #     "rev" = "91ff86cd9c29299a64f968ebb45846c485725f23";
+  #   };
+  # };
+  # null-ls-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "null-ls-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:jose-elias-alvarez/null-ls.nvim";
+  #     "rev" = "643c67a296711ff40f1a4d1bec232fa20b179b90";
+  #   };
+  # };
   tmux-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
     name = "tmux-nvim-${version}";
@@ -172,51 +172,51 @@ let
       "rev" = "1ad660c1c28aa81fd67a56ef60f46121711ed6fb";
     };
   };
-  lualine-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "lualine-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:nvim-lualine/lualine.nvim";
-      "rev" = "edca2b03c724f22bdc310eee1587b1523f31ec7c";
-    };
-  };
-  schemastore-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "schemastore-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:b0o/SchemaStore.nvim";
-      "rev" = "17d16277a214cc67710694c83c6c0c5aa1e13bb0";
-    };
-  };
-  telescope-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "telescope-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:nvim-telescope/telescope.nvim";
-      "rev" = "f174a0367b4fc7cb17710d867e25ea792311c418";
-    };
-  };
-  editorconfig-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "editorconfig-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:gpanders/editorconfig.nvim";
-      "rev" = "7d10fe6bc340fd783c0b61cf627dd235100284db";
-    };
-  };
-  lsp_signature-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "lsp_signature-nvim-${version}";
-    src = builtins.fetchGit {
-      "ref" = "master";
-      "url" = "git@github.com:ray-x/lsp_signature.nvim";
-      "rev" = "e65a63858771db3f086c8d904ff5f80705fd962b";
-    };
-  };
+  # lualine-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "lualine-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:nvim-lualine/lualine.nvim";
+  #     "rev" = "edca2b03c724f22bdc310eee1587b1523f31ec7c";
+  #   };
+  # };
+  # schemastore-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "schemastore-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:b0o/SchemaStore.nvim";
+  #     "rev" = "17d16277a214cc67710694c83c6c0c5aa1e13bb0";
+  #   };
+  # };
+  # telescope-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "telescope-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:nvim-telescope/telescope.nvim";
+  #     "rev" = "f174a0367b4fc7cb17710d867e25ea792311c418";
+  #   };
+  # };
+  # editorconfig-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "editorconfig-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:gpanders/editorconfig.nvim";
+  #     "rev" = "7d10fe6bc340fd783c0b61cf627dd235100284db";
+  #   };
+  # };
+  # lsp_signature-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "lsp_signature-nvim-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "master";
+  #     "url" = "git@github.com:ray-x/lsp_signature.nvim";
+  #     "rev" = "e65a63858771db3f086c8d904ff5f80705fd962b";
+  #   };
+  # };
   arial-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
     name = "arial-nvim-${version}";
@@ -226,31 +226,46 @@ let
       "rev" = "159041f5f6e0ba914221f097886f1d31ce419c04";
     };
   };
-  auto-session = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  # auto-session = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "auto-session-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:rmagatti/auto-session";
+  #     "rev" = "609c952a50ff1d415d79323364e934eba607fce0";
+  #   };
+  # };
+  tree-sitter-astro = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
-    name = "auto-session-${version}";
+    name = "tree-sitter-astro-${version}";
     src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:rmagatti/auto-session";
-      "rev" = "609c952a50ff1d415d79323364e934eba607fce0";
+      "ref" = "master";
+      "url" = "git@github.com:virchau13/tree-sitter-astro.git";
+      "rev" = "947e93089e60c66e681eba22283f4037841451e7";
     };
+    buildPhase = ''
+      runHook preBuild
+      mkdir -p parser/
+      ${pkgs.clang}/bin/clang++ -o parser/astro.so -I$src/src $src/src/parser.c $src/src/scanner.cc -shared  -Os -lstdc++ -fPIC
+      runHook postBuild
+    '';
   };
-  rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
-    version = "latest";
-    name = "rose-pine-${version}";
-    src = builtins.fetchGit {
-      "ref" = "main";
-      "url" = "git@github.com:rose-pine/neovim";
-      "rev" = "40c4fd7f5551710e388e0df85bb43d6e1627ca80";
-    };
-  };
+  # rose-pine = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+  #   version = "latest";
+  #   name = "rose-pine-${version}";
+  #   src = builtins.fetchGit {
+  #     "ref" = "main";
+  #     "url" = "git@github.com:rose-pine/neovim";
+  #     "rev" = "40c4fd7f5551710e388e0df85bb43d6e1627ca80";
+  #   };
+  # };
   oh-lucy-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
     version = "latest";
     name = "oh-lucy-nvim-${version}";
     src = builtins.fetchGit {
       "ref" = "main";
       "url" = "git@github.com:Yazeed1s/oh-lucy.nvim";
-      "rev" = "f20cf20d522cdb919a36bce265ab425b05fc2065";
+      "rev" = "706c74fe8dcc2014dc17bbc861a05d27623e06e3";
     };
   };
 
@@ -296,6 +311,8 @@ in {
 
     sumneko-lua-language-server
     nodePackages.typescript-language-server
+    nodePackages.svelte-language-server
+    nodePackages.graphql-language-service-cli
     stylua
     nodePackages.eslint_d
     nodePackages.prettier
@@ -381,51 +398,40 @@ in {
     withNodeJs = true;
     extraConfig = builtins.readFile ./init.vim;
     plugins = [
-      cmp-nvim-lsp
-      cmp-nvim-lua
-      cmp-path
-      cmp_luasnip
-      comment-nvim
-      indent-blankline-nvim
-      luasnip
-      null-ls-nvim
-      nvim-autopairs
-      nvim-cmp
-      nvim-lspconfig
-      nvim-surround
-      nvim-ts-context-commentstring
-      plenary-nvim
-      rose-pine
-      yanky-nvim
-      tmux-nvim
-      lualine-nvim
-      schemastore-nvim
-      telescope-nvim
-      editorconfig-nvim
-      lsp_signature-nvim
-      scratch-vim
       arial-nvim
       oh-lucy-nvim
-      auto-session
-    # nvim-miniyank
-    # pkgs.vimPlugins.auto-pairs
-    # # pkgs.vimPlugins.coc-nvim
-    # pkgs.vimPlugins.editorconfig-vim
-    # pkgs.vimPlugins.fzf-vim
-    # pkgs.vimPlugins.lightline-vim
-    # pkgs.vimPlugins.lush-nvim
-      pkgs.vimPlugins.nvim-treesitter
-    # pkgs.vimPlugins.tmux-navigator
+      scratch-vim
+      tmux-nvim
+      tree-sitter-astro
+      yanky-nvim
+      pkgs.vimPlugins.SchemaStore-nvim
+      pkgs.vimPlugins.auto-session
+      pkgs.vimPlugins.cmp-nvim-lsp
+      pkgs.vimPlugins.cmp-nvim-lua
+      pkgs.vimPlugins.cmp-path
+      pkgs.vimPlugins.cmp_luasnip
+      pkgs.vimPlugins.comment-nvim
+      pkgs.vimPlugins.editorconfig-nvim
+      pkgs.vimPlugins.indent-blankline-nvim
+      pkgs.vimPlugins.lsp_signature-nvim
+      pkgs.vimPlugins.lualine-nvim
+      pkgs.vimPlugins.luasnip
+      pkgs.vimPlugins.null-ls-nvim
+      pkgs.vimPlugins.nvim-autopairs
+      pkgs.vimPlugins.nvim-cmp
+      pkgs.vimPlugins.nvim-lspconfig
+      pkgs.vimPlugins.nvim-surround
+      pkgs.vimPlugins.nvim-treesitter.withAllGrammars
+      pkgs.vimPlugins.nvim-ts-context-commentstring
+      pkgs.vimPlugins.plenary-nvim
+      pkgs.vimPlugins.rose-pine
+      pkgs.vimPlugins.telescope-nvim
       pkgs.vimPlugins.vim-abolish
       pkgs.vimPlugins.vim-dispatch
       pkgs.vimPlugins.vim-easy-align
       pkgs.vimPlugins.vim-fugitive
-    # # pkgs.vimPlugins.vim-polyglot
-    # pkgs.vimPlugins.vim-repeat
       pkgs.vimPlugins.vim-rhubarb
-    # pkgs.vimPlugins.vim-sensible
       pkgs.vimPlugins.vim-vinegar
-    # # vim-scratch
     ];
   };
 
@@ -438,10 +444,10 @@ in {
     extraConfig = builtins.readFile ./tmux.conf;
     plugins = [
       pkgs.tmuxPlugins.vim-tmux-navigator
-      {
-        plugin = pkgs.tmuxPlugins.tmux-colors-solarized;
-        extraConfig = "set -g @colors-solarized 'dark'";
-      }
+      # {
+      #   plugin = pkgs.tmuxPlugins.tmux-colors-solarized;
+      #   extraConfig = "set -g @colors-solarized 'dark'";
+      # }
     ];
   };
 }

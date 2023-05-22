@@ -2,7 +2,7 @@
   "entries": {
     "tap": {
       "homebrew/cask": {
-        "revision": "e607b7e27f90316df5213fc9061f7dfa608e7f84"
+        "revision": "57a0012d8ebacbba1e41d867df4c742af4a88868"
       }
     },
     "cask": {
@@ -43,7 +43,7 @@
         }
       },
       "docker": {
-        "version": "4.13.1,90346",
+        "version": "4.15.0,93002",
         "options": {
           "full_name": "docker",
           "args": {
@@ -61,7 +61,7 @@
         }
       },
       "google-chrome": {
-        "version": "107.0.5304.110",
+        "version": "108.0.5359.98",
         "options": {
           "full_name": "google-chrome",
           "args": {
@@ -115,7 +115,7 @@
         }
       },
       "rectangle": {
-        "version": "0.61,67",
+        "version": "0.64,70",
         "options": {
           "full_name": "rectangle",
           "args": {
@@ -178,7 +178,7 @@
         }
       },
       "visual-studio-code": {
-        "version": "1.73.1",
+        "version": "1.74.0",
         "options": {
           "full_name": "visual-studio-code",
           "args": {
@@ -250,7 +250,7 @@
         }
       },
       "notion": {
-        "version": "2.1.4",
+        "version": "2.1.9",
         "options": {
           "full_name": "notion",
           "args": {
@@ -259,7 +259,7 @@
         }
       },
       "slack": {
-        "version": "4.29.144",
+        "version": "4.29.149",
         "options": {
           "full_name": "slack",
           "args": {
@@ -277,7 +277,7 @@
         }
       },
       "zoom": {
-        "version": "5.12.7.12529",
+        "version": "5.12.9.13190",
         "options": {
           "full_name": "zoom",
           "args": {
@@ -295,7 +295,7 @@
         }
       },
       "loom": {
-        "version": "0.81.2",
+        "version": "0.147.2",
         "options": {
           "full_name": "loom",
           "args": {
@@ -313,7 +313,7 @@
         }
       },
       "figma": {
-        "version": "116.5.17",
+        "version": "116.5.18",
         "options": {
           "full_name": "figma",
           "args": {
@@ -322,7 +322,7 @@
         }
       },
       "descript": {
-        "version": "51.1.3-release.20221103.8",
+        "version": "53.1.1-release.20221205.1",
         "options": {
           "full_name": "descript",
           "args": {
@@ -349,7 +349,7 @@
         }
       },
       "bitwarden": {
-        "version": "2022.10.1",
+        "version": "2022.11.0",
         "options": {
           "full_name": "bitwarden",
           "args": {
@@ -367,7 +367,7 @@
         }
       },
       "linear-linear": {
-        "version": "1.12.3,2211089s7jg7962",
+        "version": "1.12.4,221114yb4h0nuj3",
         "options": {
           "full_name": "linear-linear",
           "args": {
@@ -388,9 +388,9 @@
         "macOS": "10.15.6"
       },
       "monterey": {
-        "HOMEBREW_VERSION": "3.6.10",
+        "HOMEBREW_VERSION": "3.6.14",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "4a7c79965647f86a83ab36c12146b34472faf127",
+        "Homebrew/homebrew-core": "09b5a198d63f2067d0e1b3f5cc5bedb53f37cefc",
         "CLT": "14.0.0.0.1.1661618636",
         "Xcode": "14.1",
         "macOS": "12.6"
