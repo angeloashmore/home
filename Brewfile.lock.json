@@ -2,7 +2,7 @@
   "entries": {
     "tap": {
       "homebrew/cask": {
-        "revision": "57a0012d8ebacbba1e41d867df4c742af4a88868"
+        "revision": "c3ce5dd862ec65ce991ba3d8ef3aebcd2d92da37"
       }
     },
     "cask": {
@@ -25,7 +25,7 @@
         }
       },
       "dash": {
-        "version": "6.4.0,1006",
+        "version": "6.4.0",
         "options": {
           "full_name": "dash",
           "args": {
@@ -34,7 +34,7 @@
         }
       },
       "discord": {
-        "version": "0.0.269",
+        "version": "0.0.275",
         "options": {
           "full_name": "discord",
           "args": {
@@ -43,7 +43,7 @@
         }
       },
       "docker": {
-        "version": "4.15.0,93002",
+        "version": "4.19.0,106363",
         "options": {
           "full_name": "docker",
           "args": {
@@ -61,7 +61,7 @@
         }
       },
       "google-chrome": {
-        "version": "108.0.5359.98",
+        "version": "113.0.5672.126",
         "options": {
           "full_name": "google-chrome",
           "args": {
@@ -79,7 +79,7 @@
         }
       },
       "insomnia": {
-        "version": "2022.6.0",
+        "version": "2023.2.2",
         "options": {
           "full_name": "insomnia",
           "args": {
@@ -115,7 +115,7 @@
         }
       },
       "rectangle": {
-        "version": "0.64,70",
+        "version": "0.68",
         "options": {
           "full_name": "rectangle",
           "args": {
@@ -142,7 +142,7 @@
         }
       },
       "sketch": {
-        "version": "94.1,156562",
+        "version": "96.3,167315",
         "options": {
           "full_name": "sketch",
           "args": {
@@ -151,7 +151,7 @@
         }
       },
       "steermouse": {
-        "version": "5.6.6",
+        "version": "5.6.7",
         "options": {
           "full_name": "steermouse",
           "args": {
@@ -178,7 +178,7 @@
         }
       },
       "visual-studio-code": {
-        "version": "1.74.0",
+        "version": "1.78.2",
         "options": {
           "full_name": "visual-studio-code",
           "args": {
@@ -250,7 +250,7 @@
         }
       },
       "notion": {
-        "version": "2.1.9",
+        "version": "2.1.15",
         "options": {
           "full_name": "notion",
           "args": {
@@ -259,7 +259,7 @@
         }
       },
       "slack": {
-        "version": "4.29.149",
+        "version": "4.32.122",
         "options": {
           "full_name": "slack",
           "args": {
@@ -268,7 +268,7 @@
         }
       },
       "via": {
-        "version": "2.0.5",
+        "version": "3.0.0",
         "options": {
           "full_name": "via",
           "args": {
@@ -277,7 +277,7 @@
         }
       },
       "zoom": {
-        "version": "5.12.9.13190",
+        "version": "5.14.7.18149",
         "options": {
           "full_name": "zoom",
           "args": {
@@ -295,7 +295,7 @@
         }
       },
       "loom": {
-        "version": "0.147.2",
+        "version": "0.161.6",
         "options": {
           "full_name": "loom",
           "args": {
@@ -304,7 +304,7 @@
         }
       },
       "kitty": {
-        "version": "0.26.5",
+        "version": "0.28.1",
         "options": {
           "full_name": "kitty",
           "args": {
@@ -313,7 +313,7 @@
         }
       },
       "figma": {
-        "version": "116.5.18",
+        "version": "116.9.5",
         "options": {
           "full_name": "figma",
           "args": {
@@ -322,7 +322,7 @@
         }
       },
       "descript": {
-        "version": "53.1.1-release.20221205.1",
+        "version": "64.1.1-release.20230518.17499",
         "options": {
           "full_name": "descript",
           "args": {
@@ -349,7 +349,7 @@
         }
       },
       "bitwarden": {
-        "version": "2022.11.0",
+        "version": "2023.4.0",
         "options": {
           "full_name": "bitwarden",
           "args": {
@@ -367,9 +367,18 @@
         }
       },
       "linear-linear": {
-        "version": "1.12.4,221114yb4h0nuj3",
+        "version": "1.18.1,23042060c9ivdrq",
         "options": {
           "full_name": "linear-linear",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "todoist": {
+        "version": "8.1.2",
+        "options": {
+          "full_name": "todoist",
           "args": {
             "appdir": "~/Applications"
           }
@@ -388,12 +397,12 @@
         "macOS": "10.15.6"
       },
       "monterey": {
-        "HOMEBREW_VERSION": "3.6.14",
+        "HOMEBREW_VERSION": "4.0.19",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "09b5a198d63f2067d0e1b3f5cc5bedb53f37cefc",
-        "CLT": "14.0.0.0.1.1661618636",
-        "Xcode": "14.1",
-        "macOS": "12.6"
+        "Homebrew/homebrew-core": "api",
+        "CLT": "14.2.0.0.1.1668646533",
+        "Xcode": "14.2",
+        "macOS": "12.6.3"
       }
     }
   }
