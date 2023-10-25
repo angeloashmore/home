@@ -25,8 +25,8 @@ luafile ~/.config/nvim/lua/init.lua
     " let g:netrw_banner=0
 
     " Hide fzf status bar
-    autocmd! FileType fzf set laststatus=0 noshowmode noruler
-          \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+    " autocmd! FileType fzf set laststatus=0 noshowmode noruler
+    "       \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 
 " lightline
     let g:lightline = {

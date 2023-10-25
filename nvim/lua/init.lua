@@ -29,7 +29,7 @@ vim.opt.list = true
 vim.opt.listchars = "tab:  ,trail:·,extends:…,precedes:…"
 
 -- Colorscheme
-vim.cmd([[colorscheme oh-lucy]])
+vim.cmd([[colorscheme oh-lucy-evening]])
 
 -- Indention
 vim.opt.filetype = "on"

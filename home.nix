@@ -268,6 +268,15 @@ let
       "rev" = "706c74fe8dcc2014dc17bbc861a05d27623e06e3";
     };
   };
+  zenbones-nvim = pkgs.vimUtils.buildVimPluginFrom2Nix rec {
+    version = "latest";
+    name = "zenbones-nvim-${version}";
+    src = builtins.fetchGit {
+      "ref" = "main";
+      "url" = "git@github.com:mcchrish/zenbones.nvim";
+      "rev" = "e2a3fda09b3da0d5a23182a8ffdf03c2c2771794";
+    };
+  };
 
 in {
   # Let Home Manager install and manage itself.
@@ -424,7 +433,6 @@ in {
       pkgs.vimPlugins.nvim-treesitter.withAllGrammars
       pkgs.vimPlugins.nvim-ts-context-commentstring
       pkgs.vimPlugins.plenary-nvim
-      pkgs.vimPlugins.rose-pine
       pkgs.vimPlugins.telescope-nvim
       pkgs.vimPlugins.vim-abolish
       pkgs.vimPlugins.vim-dispatch
