@@ -19,34 +19,42 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, opts)
 
 local default_config = {
-	-- capabilities = require("cmp_nvim_lsp").default_capabilities(),
+	capabilities = require("cmp_nvim_lsp").default_capabilities(),
 	on_attach = on_attach,
 }
 
 local lspconfig = require("lspconfig")
 lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.default_config, default_config)
 
-require("lspconfig").sumneko_lua.setup({
-	settings = {
-		Lua = {
-			runtime = {
-				-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-				version = "LuaJIT",
-			},
-			diagnostics = {
-				-- Get the language server to recognize the `vim` global
-				globals = { "vim" },
-			},
-			workspace = {
-				-- Make the server aware of Neovim runtime files
-				library = vim.api.nvim_get_runtime_file("", true),
-			},
-			-- Do not send telemetry data containing a randomized but unique identifier
-			telemetry = {
-				enable = false,
-			},
-		},
-	},
+require("lspconfig").lua_ls.setup({
+	on_init = function(client)
+		local path = client.workspace_folders[1].name
+		if not vim.loop.fs_stat(path .. "/.luarc.json") and not vim.loop.fs_stat(path .. "/.luarc.jsonc") then
+			client.config.settings = vim.tbl_deep_extend("force", client.config.settings, {
+				Lua = {
+					runtime = {
+						-- Tell the language server which version of Lua you're using
+						-- (most likely LuaJIT in the case of Neovim)
+						version = "LuaJIT",
+					},
+					-- Make the server aware of Neovim runtime files
+					workspace = {
+						checkThirdParty = false,
+						library = {
+							vim.env.VIMRUNTIME,
+							-- "${3rd}/luv/library"
+							-- "${3rd}/busted/library",
+						},
+						-- or pull in all of 'runtimepath'. NOTE: this is a lot slower
+						-- library = vim.api.nvim_get_runtime_file("", true)
+					},
+				},
+			})
+
+			client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+		end
+		return true
+	end,
 })
 
 require("lspconfig").jsonls.setup({
@@ -63,7 +71,14 @@ require("lspconfig").graphql.setup({
 })
 
 require("lspconfig").tsserver.setup({})
-require("lspconfig").cssls.setup({})
+
+--Enable (broadcasting) snippet capability for completion
+local cssls_capabilities = vim.lsp.protocol.make_client_capabilities()
+cssls_capabilities.textDocument.completion.completionItem.snippetSupport = true
+require("lspconfig").cssls.setup({
+	capabilities = cssls_capabilities,
+})
+
 require("lspconfig").html.setup({})
 require("lspconfig").astro.setup({})
 require("lspconfig").svelte.setup({})

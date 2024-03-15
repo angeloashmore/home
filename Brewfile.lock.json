@@ -3,6 +3,9 @@
     "tap": {
       "homebrew/cask": {
         "revision": "7a69ce83f74fd4185cbcd97696e9d216e5caf4f6"
+      },
+      "sdkman/tap": {
+        "revision": "9f696e2ae59ef6ab7762f1d75b5c13ac09d2eaa8"
       }
     },
     "cask": {
@@ -25,7 +28,7 @@
         }
       },
       "dash": {
-        "version": "7.1.5",
+        "version": "7.2.1",
         "options": {
           "full_name": "dash",
           "args": {
@@ -34,7 +37,7 @@
         }
       },
       "discord": {
-        "version": "0.0.281",
+        "version": "0.0.296",
         "options": {
           "full_name": "discord",
           "args": {
@@ -61,7 +64,7 @@
         }
       },
       "google-chrome": {
-        "version": "118.0.5993.117",
+        "version": "122.0.6261.129",
         "options": {
           "full_name": "google-chrome",
           "args": {
@@ -79,7 +82,7 @@
         }
       },
       "insomnia": {
-        "version": "8.3.0",
+        "version": "8.6.1",
         "options": {
           "full_name": "insomnia",
           "args": {
@@ -115,7 +118,7 @@
         }
       },
       "rectangle": {
-        "version": "0.73",
+        "version": "0.76",
         "options": {
           "full_name": "rectangle",
           "args": {
@@ -142,7 +145,7 @@
         }
       },
       "sketch": {
-        "version": "98.3,176563",
+        "version": "99.5,178873",
         "options": {
           "full_name": "sketch",
           "args": {
@@ -178,7 +181,7 @@
         }
       },
       "visual-studio-code": {
-        "version": "1.83.1",
+        "version": "1.87.2",
         "options": {
           "full_name": "visual-studio-code",
           "args": {
@@ -250,7 +253,7 @@
         }
       },
       "notion": {
-        "version": "2.2.4",
+        "version": "3.2.1",
         "options": {
           "full_name": "notion",
           "args": {
@@ -259,7 +262,7 @@
         }
       },
       "slack": {
-        "version": "4.35.121",
+        "version": "4.36.140",
         "options": {
           "full_name": "slack",
           "args": {
@@ -295,7 +298,7 @@
         }
       },
       "loom": {
-        "version": "0.180.2",
+        "version": "0.209.1",
         "options": {
           "full_name": "loom",
           "args": {
@@ -304,7 +307,7 @@
         }
       },
       "kitty": {
-        "version": "0.30.1",
+        "version": "0.33.0",
         "options": {
           "full_name": "kitty",
           "args": {
@@ -313,7 +316,7 @@
         }
       },
       "figma": {
-        "version": "116.13.3",
+        "version": "116.16.13",
         "options": {
           "full_name": "figma",
           "args": {
@@ -349,7 +352,7 @@
         }
       },
       "bitwarden": {
-        "version": "2023.9.3",
+        "version": "2024.3.0",
         "options": {
           "full_name": "bitwarden",
           "args": {
@@ -367,7 +370,7 @@
         }
       },
       "linear-linear": {
-        "version": "1.22.1,2309297qs4n1ask",
+        "version": "1.24.1,240304wsaf9zmfe",
         "options": {
           "full_name": "linear-linear",
           "args": {
@@ -376,7 +379,7 @@
         }
       },
       "todoist": {
-        "version": "8.9.2",
+        "version": "8.17.3",
         "options": {
           "full_name": "todoist",
           "args": {
@@ -385,11 +388,84 @@
         }
       },
       "keka": {
-        "version": "1.3.5",
+        "version": "1.3.7",
         "options": {
           "full_name": "keka",
           "args": {
             "appdir": "~/Applications"
+          }
+        }
+      },
+      "github": {
+        "version": "3.3.11-d0de25f5",
+        "options": {
+          "full_name": "github",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "raycast": {
+        "version": "1.69.3",
+        "options": {
+          "full_name": "raycast",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      },
+      "tunnelblick": {
+        "version": "4.0.1,5971",
+        "options": {
+          "full_name": "tunnelblick",
+          "args": {
+            "appdir": "~/Applications"
+          }
+        }
+      }
+    },
+    "brew": {
+      "dnsmasq": {
+        "version": "2.90",
+        "bottle": {
+          "rebuild": 0,
+          "root_url": "https://ghcr.io/v2/homebrew/core",
+          "files": {
+            "arm64_sonoma": {
+              "cellar": "/opt/homebrew/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/dnsmasq/blobs/sha256:b6897c95d454b3d7a0d488b3cba0f525a90c951d8690929a80794aee05f48ae7",
+              "sha256": "b6897c95d454b3d7a0d488b3cba0f525a90c951d8690929a80794aee05f48ae7"
+            },
+            "arm64_ventura": {
+              "cellar": "/opt/homebrew/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/dnsmasq/blobs/sha256:96d78b8341adb55a2f3260fa4813102e7c08bc0d61306401de5bf4f1e49843b2",
+              "sha256": "96d78b8341adb55a2f3260fa4813102e7c08bc0d61306401de5bf4f1e49843b2"
+            },
+            "arm64_monterey": {
+              "cellar": "/opt/homebrew/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/dnsmasq/blobs/sha256:740412d9203cd865d9cafb9c10a3bc69ef19e44291954d7c26e48b17fd378039",
+              "sha256": "740412d9203cd865d9cafb9c10a3bc69ef19e44291954d7c26e48b17fd378039"
+            },
+            "sonoma": {
+              "cellar": "/usr/local/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/dnsmasq/blobs/sha256:0e20ef773a39be121ee8fddc46a6dca9f1d6b9c09cc069bfa75334bff479079b",
+              "sha256": "0e20ef773a39be121ee8fddc46a6dca9f1d6b9c09cc069bfa75334bff479079b"
+            },
+            "ventura": {
+              "cellar": "/usr/local/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/dnsmasq/blobs/sha256:f0fda257b89641375e5711c1afdc66c35771234a7fc2a51c124cc856085dd005",
+              "sha256": "f0fda257b89641375e5711c1afdc66c35771234a7fc2a51c124cc856085dd005"
+            },
+            "monterey": {
+              "cellar": "/usr/local/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/dnsmasq/blobs/sha256:51b10e0af794890ffcf3220848032c3086af3d3f5d488b454003fcde72793225",
+              "sha256": "51b10e0af794890ffcf3220848032c3086af3d3f5d488b454003fcde72793225"
+            },
+            "x86_64_linux": {
+              "cellar": "/home/linuxbrew/.linuxbrew/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/dnsmasq/blobs/sha256:ba407d18d57b06e39f5576cda5f97703b1def62c14960d62f16eecd236180fc4",
+              "sha256": "ba407d18d57b06e39f5576cda5f97703b1def62c14960d62f16eecd236180fc4"
+            }
           }
         }
       }
@@ -422,11 +498,11 @@
         "macOS": "13.5.1"
       },
       "sonoma": {
-        "HOMEBREW_VERSION": "4.1.17",
+        "HOMEBREW_VERSION": "4.2.12",
         "HOMEBREW_PREFIX": "/opt/homebrew",
         "Homebrew/homebrew-core": "api",
         "CLT": "15.0.0.0.1.1694021235",
-        "Xcode": "15.0",
+        "Xcode": "15.1",
         "macOS": "14.0"
       }
     }
