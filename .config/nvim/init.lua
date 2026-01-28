@@ -364,4 +364,3 @@ require("nvim-tmux-navigation").setup({
 		next = "<C-Space>",
 	},
 })
-require("mdx").setup()
