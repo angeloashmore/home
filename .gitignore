@@ -1,1 +1,38 @@
-secrets.sh
+*
+!.gitignore
+!Brewfile
+!.npm-global-packages
+!README.md
+!.config/
+.config/*
+
+# zsh
+!.zshenv
+!.config/zsh/
+!.config/zsh/**
+.config/zsh/.antidote/
+.config/zsh/.zsh_plugins.zsh
+.config/zsh/.zsh_history
+.config/zsh/.zcompdump*
+.config/zsh/.zsh_sessions/
+
+# nvim
+!.config/nvim/
+!.config/nvim/**
+
+# mise
+!.config/mise/
+!.config/mise/config.toml
+
+# git
+!.gitconfig
+!.config/git/
+!.config/git/**
+
+# tmux
+!.tmux.conf
+
+# ghostty
+!.config/ghostty/
+!.config/ghostty/**
+

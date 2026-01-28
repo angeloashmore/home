@@ -1,0 +1,57 @@
+font-family = JetBrains Mono
+font-family = Symbols Nerd Font Mono
+font-size = 13
+adjust-cell-height = 60%
+adjust-cursor-height = 60%
+# font-thicken
+
+mouse-hide-while-typing
+
+title = " "
+macos-titlebar-style = hidden
+
+# Shift+Enter -> new line
+keybind = shift+enter=text:\x1b\r
+
+background = 1E1D23
+foreground = DED7D0
+
+selection-foreground = 1A1B1F
+selection-background = CFD0D7
+
+cursor-color = DFE0EA
+
+window-colorspace = display-p3
+
+# Black
+palette = 0=35333d
+palette = 1=35333d
+
+# Red
+palette = 1=FF7DA3
+palette = 9=FF7DA3
+
+# Green
+palette = 2=7EC49D
+palette = 10=7EC49D
+
+# Yellow
+palette = 3=EFD472
+palette = 11=EFD472
+
+# Blue
+palette = 4=8BB8D0
+palette = 12=8BB8D0
+
+# Magenta
+palette = 5=BDA9D4
+palette = 13=BDA9D4
+
+# Cyan
+palette = 6=BDA9D4
+palette = 14=BDA9D4
+
+# White
+palette = 7=DED7D0
+palette = 15=DED7D0
+

@@ -1,0 +1,6 @@
+# miekg/lean
+# subnixr/minimal
+zsh-users/zsh-syntax-highlighting
+# jeffreytse/zsh-vi-mode
+# sindresorhus/pure
+# reobin/typewritten

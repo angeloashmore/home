@@ -1,0 +1,14 @@
+@astrojs/language-server
+@fsouza/prettierd
+@johnnymorganz/stylua-bin
+@mdx-js/language-server
+@tailwindcss/language-server
+@vtsls/language-server
+eslint_d
+oxlint
+stylelint-lsp
+svelte-language-server
+typescript-language-server
+typescript
+vls
+vscode-langservers-extracted

@@ -1,0 +1,12 @@
+.DS_Store
+mise.local.toml
+.aider*
+CLAUDE.md
+node_modules/
+.marksman.toml
+mise.toml
+
+**/.claude/settings.local.json
+
+# zsh plugin manager (cloned, not tracked)
+.antidote/
