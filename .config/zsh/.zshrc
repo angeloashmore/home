@@ -7,18 +7,10 @@ RPROMPT='%F{black}%2d'
 
 set -s set-clipboard on
 
-# docs.pkgx.sh
-# eval "$(pkgx --quiet dev --shellcode)"
-
 # mise.jdx.dev
 eval "$(~/.local/bin/mise activate zsh)"
 
-# source antidote
+# antidote
 source $ZDOTDIR/.antidote/antidote.zsh
-
-# initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
 antidote load
 
-# if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-#         exec tmux new-session -A -s "main"
-# fi
