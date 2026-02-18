@@ -1,0 +1,32 @@
+FROM docker/sandbox-templates:claude-code
+
+USER root
+
+# Node.js 24
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+    apt-get install -y nodejs
+
+# Neovim from PPA + build tools + tini
+RUN apt-get update && apt-get install -y software-properties-common gcc make tini && \
+    add-apt-repository -y ppa:neovim-ppa/unstable && \
+    apt-get update && apt-get install -y neovim && \
+    rm -rf /var/lib/apt/lists/*
+
+# tree-sitter CLI for neovim
+RUN npm install -g tree-sitter-cli
+
+# OSC 52 clipboard shims (for tmux/terminal passthrough)
+RUN echo '#!/bin/bash' > /usr/local/bin/pbcopy && \
+    echo 'printf "\e]52;c;%s\a" "$(base64 | tr -d "\n")" > /dev/tty' >> /usr/local/bin/pbcopy && \
+    chmod +x /usr/local/bin/pbcopy && \
+    ln -s /usr/local/bin/pbcopy /usr/local/bin/xclip
+
+# Wrapper script for claude
+RUN echo '#!/bin/bash' > /usr/local/bin/claudec && \
+    echo 'exec claude --dangerously-skip-permissions "$@"' >> /usr/local/bin/claudec && \
+    chmod +x /usr/local/bin/claudec
+
+USER agent
+ENV TERM=xterm-256color
+ENV EDITOR=nvim
+ENV PATH="/home/agent/.local/bin:${PATH}"

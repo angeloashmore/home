@@ -1,0 +1,30 @@
+#!/bin/bash
+set -euo pipefail
+
+SCRIPT_NAME="$(basename "$0")"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+IMAGE_NAME="claude"
+CONTAINER_HOME="/home/agent"
+
+# Build image if it doesn't exist
+STATE_FILE="${HOME}/Library/Application Support/com.apple.container/state.json"
+if ! grep -q "\"${IMAGE_NAME}:latest\"" "$STATE_FILE" 2>/dev/null; then
+  echo "→ Building ${IMAGE_NAME} image..."
+  container build --tag "${IMAGE_NAME}" --file "${SCRIPT_DIR}/${SCRIPT_NAME}.d/Containerfile" "${SCRIPT_DIR}/${SCRIPT_NAME}.d"
+fi
+
+container run -it --rm \
+  --ssh \
+  --cpus 4 --memory 4G \
+  --env HOME="${CONTAINER_HOME}" \
+  --env GH_TOKEN="$(gh auth token)" \
+  --volume "claude-state:${CONTAINER_HOME}/.claude" \
+  --volume "${HOME}/.config/nvim:${CONTAINER_HOME}/.config/nvim:ro" \
+  --volume "${HOME}/.config/gh:${CONTAINER_HOME}/.config/gh:ro" \
+  --volume "${HOME}/.config/git:${CONTAINER_HOME}/.config/git:ro" \
+  --volume "${HOME}/.gitconfig:${CONTAINER_HOME}/.gitconfig:ro" \
+  --volume "$(pwd):$(pwd)" \
+  --workdir "$(pwd)" \
+  --publish 3000:3000 \
+  "${IMAGE_NAME}" \
+  /usr/bin/tini -- /home/agent/.local/bin/claude --dangerously-skip-permissions "$@"
