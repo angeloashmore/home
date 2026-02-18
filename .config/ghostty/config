@@ -7,6 +7,9 @@ adjust-cursor-height = 60%
 
 mouse-hide-while-typing
 
+clipboard-read = allow
+clipboard-write = allow
+
 title = " "
 macos-titlebar-style = hidden
 

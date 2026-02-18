@@ -12,6 +12,7 @@ url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d
 [macos-x64]
 url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/{version}/darwin-x64/claude"
 """, version_list_url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/stable" }
+container = "latest"
 ffmpeg = "latest"
 gh = "latest"
 go = "latest"
@@ -26,6 +27,7 @@ python = "latest"
 rg = "latest"
 tmux = "latest"
 tree-sitter = "latest"
+uv = "latest"
 yarn = "latest"
 
 [env]

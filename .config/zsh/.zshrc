@@ -14,3 +14,8 @@ eval "$(~/.local/bin/mise activate zsh)"
 source $ZDOTDIR/.antidote/antidote.zsh
 antidote load
 
+# start container automatically
+container() {
+  command container system start 2>/dev/null
+  command container "$@"
+}

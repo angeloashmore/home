@@ -19,6 +19,9 @@ mise install
 # npm global packages
 xargs npm i -g < ~/.npm-global-packages
 
+# container (apple)
+container system property set build.rosetta false
+
 # homebrew (casks only)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew bundle --file=~/Brewfile
