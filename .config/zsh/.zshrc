@@ -1,5 +1,6 @@
 export PATH=~/bin:~/.local/bin:~/.npm-global/bin:/opt/homebrew/bin:$PATH
 export EDITOR=nvim
+export CLAUDE_CONFIG_DIR=~/.config/claude
 
 autoload -U colors && colors
 PROMPT="%F{black}──%F{reset_color} "
@@ -16,6 +17,6 @@ antidote load
 
 # start container automatically
 container() {
-  command container system start 2>/dev/null
+  command container system start >/dev/null
   command container "$@"
 }

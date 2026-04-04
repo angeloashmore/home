@@ -296,11 +296,12 @@ vim.pack.add({
 	"https://github.com/tpope/vim-dispatch",
 	"https://github.com/tpope/vim-fugitive",
 	"https://github.com/tpope/vim-rhubarb",
-	"https://github.com/yazeed1s/oh-lucy.nvim",
+	"https://github.com/kvrohit/rasmus.nvim",
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 })
 
-vim.cmd.colorscheme("oh-lucy-evening")
+vim.g.rasmus_transparent = true
+vim.cmd.colorscheme("rasmus")
 setup_treesitter()
 setup_lsp()
 -- setup_lint()
@@ -353,6 +354,7 @@ require("conform").setup({
 		lsp_fallback = false,
 	},
 })
+require("mdx").setup()
 require("nvim-surround").setup()
 require("nvim-tmux-navigation").setup({
 	keybindings = {

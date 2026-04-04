@@ -1,0 +1,40 @@
+# background = 1a1a19
+background = 0a0a0a
+foreground = d1d1d1
+
+selection-foreground = 1a1a19
+selection-background = d1d1d1
+
+cursor-color = eaeaea
+
+# Black
+palette = 0=333332
+palette = 8=4c4c4b
+
+# Red
+palette = 1=ff968c
+palette = 9=ffafa5
+
+# Green
+palette = 2=61957f
+palette = 10=7aae98
+
+# Yellow
+palette = 3=ffc591
+palette = 11=ffdeaa
+
+# Blue
+palette = 4=8db4d4
+palette = 12=a6cded
+
+# Magenta
+palette = 5=de9bc8
+palette = 13=f7b4e1
+
+# Cyan
+palette = 6=7bb099
+palette = 14=94c9b2
+
+# White
+palette = 7=d1d1d1
+palette = 15=eaeaea

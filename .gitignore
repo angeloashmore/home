@@ -19,6 +19,7 @@
 # bin
 !bin/
 !bin/**
+bin/.claude/**
 
 # nvim
 !.config/nvim/
@@ -36,7 +37,10 @@
 # tmux
 !.tmux.conf
 
+# claude
+!.config/claude/
+!.config/claude/settings.json
+
 # ghostty
 !.config/ghostty/
 !.config/ghostty/**
-

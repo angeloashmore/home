@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+IMAGE_NAME="claudec"
+SCRIPT_DIR="$(cd "$(dirname "$0")/claudec.d" && pwd)"
+LABEL_KEY="containerfile-hash"
+
+# Rebuild if Containerfile hash differs from what's baked into the image
+CURRENT_HASH="$(cat "$SCRIPT_DIR/Containerfile" "$SCRIPT_DIR/init.lua" | shasum -a 256 | cut -d' ' -f1)"
+STORED_HASH="$(container image inspect "$IMAGE_NAME" 2>/dev/null \
+  | jq -r '.[0].variants[0].config.config.Labels["containerfile-hash"] // empty' 2>/dev/null || true)"
+
+if [[ "$CURRENT_HASH" != "$STORED_HASH" ]]; then
+  echo "Building $IMAGE_NAME image..."
+  cp "$HOME/.gitconfig" "$SCRIPT_DIR/gitconfig"
+  cp "$HOME/.config/git/ignore" "$SCRIPT_DIR/gitignore"
+  container build -t "$IMAGE_NAME" --memory 4G --label "$LABEL_KEY=$CURRENT_HASH" "$SCRIPT_DIR"
+fi
+
+# Read env vars from host Claude settings
+ENV_FLAGS=()
+SETTINGS_FILE="$HOME/.config/claude/settings.json"
+if [[ -f "$SETTINGS_FILE" ]]; then
+  while IFS='=' read -r key value; do
+    ENV_FLAGS+=(--env "$key=$value")
+  done < <(jq -r '.env // {} | to_entries[] | "\(.key)=\(.value)"' "$SETTINGS_FILE")
+fi
+
+# Forward GitHub token from host keychain
+GH_TOKEN="$(gh auth token 2>/dev/null || true)"
+if [[ -n "$GH_TOKEN" ]]; then
+  ENV_FLAGS+=(--env "GH_TOKEN=$GH_TOKEN")
+fi
+
+# Run the container
+CONTAINER_HOME="/home/agent"
+
+mkdir -p "$SCRIPT_DIR/nvim"
+
+exec container run -it --rm --init --progress none --memory 2G \
+  --env HOME="$CONTAINER_HOME" \
+  --env CLAUDE_CONFIG_DIR="$CONTAINER_HOME/.config/claude" \
+  "${ENV_FLAGS[@]}" \
+  -v "$(pwd):$(pwd)" \
+  -w "$(pwd)" \
+  -v "$HOME/.config/claude:$CONTAINER_HOME/.config/claude" \
+  -v "$SCRIPT_DIR/nvim:$CONTAINER_HOME/.local/share/nvim" \
+  --ssh \
+  -u agent \
+  "$IMAGE_NAME" \
+  claude --dangerously-skip-permissions \
+  "$@"

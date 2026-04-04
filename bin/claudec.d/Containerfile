@@ -1,0 +1,47 @@
+FROM node:lts-bookworm
+
+# Corepack (yarn + pnpm)
+RUN corepack enable
+
+# System packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ripgrep jq less tree \
+  && rm -rf /var/lib/apt/lists/*
+
+# GitHub CLI
+RUN install -m 0755 -d /etc/apt/keyrings \
+  && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+       -o /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+       > /etc/apt/sources.list.d/github-cli.list \
+  && apt-get update && apt-get install -y --no-install-recommends gh \
+  && rm -rf /var/lib/apt/lists/*
+
+# Neovim nightly (arm64)
+RUN curl -fsSL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-arm64.tar.gz \
+    | tar xz --strip-components=1 -C /usr/local
+
+# OSC 52 clipboard shims (for tmux/terminal passthrough)
+RUN echo '#!/bin/bash' > /usr/local/bin/pbcopy && \
+    echo 'printf "\e]52;c;%s\a" "$(base64 | tr -d "\n")" > /dev/tty' >> /usr/local/bin/pbcopy && \
+    chmod +x /usr/local/bin/pbcopy && \
+    ln -s /usr/local/bin/pbcopy /usr/local/bin/xclip
+
+# Create agent user
+RUN useradd -m -s /bin/bash agent
+
+# Claude Code
+USER agent
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
+# Git config
+COPY --chown=agent:agent gitconfig /home/agent/.gitconfig
+COPY --chown=agent:agent gitignore /home/agent/.config/git/ignore
+
+# Neovim config
+COPY --chown=agent:agent init.lua /home/agent/.config/nvim/init.lua
+
+ENV EDITOR=nvim
+ENV TERM=xterm-256color
+ENV PATH="/home/agent/.local/bin:${PATH}"
