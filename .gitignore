@@ -40,6 +40,7 @@ bin/.claude/**
 # claude
 !.config/claude/
 !.config/claude/settings.json
+!.config/claude/CLAUDE.md
 
 # ghostty
 !.config/ghostty/
