@@ -3,18 +3,20 @@ set -euo pipefail
 
 IMAGE_NAME="claudec"
 SCRIPT_DIR="$(cd "$(dirname "$0")/claudec.d" && pwd)"
-LABEL_KEY="containerfile-hash"
 
-# Rebuild if Containerfile hash differs from what's baked into the image
-CURRENT_HASH="$(cat "$SCRIPT_DIR/Containerfile" "$SCRIPT_DIR/init.lua" | shasum -a 256 | cut -d' ' -f1)"
-STORED_HASH="$(container image inspect "$IMAGE_NAME" 2>/dev/null \
-  | jq -r '.[0].variants[0].config.config.Labels["containerfile-hash"] // empty' 2>/dev/null || true)"
+# Rebuild on explicit --rebuild, or if the image doesn't exist yet
+if [[ "${1:-}" == "--rebuild" ]]; then
+  shift
+  BUILD=1
+elif ! container image inspect "$IMAGE_NAME" &>/dev/null; then
+  BUILD=1
+fi
 
-if [[ "$CURRENT_HASH" != "$STORED_HASH" ]]; then
+if [[ "${BUILD:-0}" == "1" ]]; then
   echo "Building $IMAGE_NAME image..."
-  cp "$HOME/.gitconfig" "$SCRIPT_DIR/gitconfig"
+  cp "$HOME/.config/git/config" "$SCRIPT_DIR/gitconfig"
   cp "$HOME/.config/git/ignore" "$SCRIPT_DIR/gitignore"
-  container build -t "$IMAGE_NAME" --memory 4G --label "$LABEL_KEY=$CURRENT_HASH" "$SCRIPT_DIR"
+  container build --no-cache -t "$IMAGE_NAME" --memory 4G "$SCRIPT_DIR"
 fi
 
 # Read env vars from host Claude settings
@@ -37,6 +39,17 @@ CONTAINER_HOME="/home/agent"
 
 mkdir -p "$SCRIPT_DIR/nvim"
 
+# PR template repo referenced by global CLAUDE.md
+PRISMIC_GITHUB_MOUNT=()
+if [[ -d "$HOME/projects/prismic/.github" ]]; then
+  PRISMIC_GITHUB_MOUNT=(-v "$HOME/projects/prismic/.github:$HOME/projects/prismic/.github:ro")
+fi
+
+PRISMIC_CONFIG_MOUNT=()
+if [[ -d "$HOME/.config/prismic" ]]; then
+  PRISMIC_CONFIG_MOUNT=(-v "$HOME/.config/prismic:$CONTAINER_HOME/.config/prismic")
+fi
+
 exec container run -it --rm --init --progress none --memory 2G \
   --env HOME="$CONTAINER_HOME" \
   --env CLAUDE_CONFIG_DIR="$CONTAINER_HOME/.config/claude" \
@@ -45,7 +58,8 @@ exec container run -it --rm --init --progress none --memory 2G \
   -w "$(pwd)" \
   -v "$HOME/.config/claude:$CONTAINER_HOME/.config/claude" \
   -v "$SCRIPT_DIR/nvim:$CONTAINER_HOME/.local/share/nvim" \
-  --ssh \
+  "${PRISMIC_GITHUB_MOUNT[@]}" \
+  "${PRISMIC_CONFIG_MOUNT[@]}" \
   -u agent \
   "$IMAGE_NAME" \
   claude --dangerously-skip-permissions \

@@ -18,6 +18,9 @@ RUN install -m 0755 -d /etc/apt/keyrings \
   && apt-get update && apt-get install -y --no-install-recommends gh \
   && rm -rf /var/lib/apt/lists/*
 
+# Seed GitHub host keys so SSH pushes work without prompting
+RUN mkdir -p /etc/ssh && ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> /etc/ssh/ssh_known_hosts
+
 # Neovim nightly (arm64)
 RUN curl -fsSL https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-arm64.tar.gz \
     | tar xz --strip-components=1 -C /usr/local
@@ -31,12 +34,8 @@ RUN echo '#!/bin/bash' > /usr/local/bin/pbcopy && \
 # Create agent user
 RUN useradd -m -s /bin/bash agent
 
-# Claude Code
-USER agent
-RUN curl -fsSL https://claude.ai/install.sh | bash
-
 # Git config
-COPY --chown=agent:agent gitconfig /home/agent/.gitconfig
+COPY --chown=agent:agent gitconfig /home/agent/.config/git/config
 COPY --chown=agent:agent gitignore /home/agent/.config/git/ignore
 
 # Neovim config
@@ -45,3 +44,7 @@ COPY --chown=agent:agent init.lua /home/agent/.config/nvim/init.lua
 ENV EDITOR=nvim
 ENV TERM=xterm-256color
 ENV PATH="/home/agent/.local/bin:${PATH}"
+
+# Claude Code
+USER agent
+RUN curl -fsSL https://claude.ai/install.sh | bash
