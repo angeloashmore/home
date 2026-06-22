@@ -5,30 +5,18 @@ IMAGE_NAME="claudec"
 SCRIPT_DIR="$(cd "$(dirname "$0")/claudec.d" && pwd)"
 
 # Rebuild on explicit --rebuild, or if the image doesn't exist yet
-if [[ "${1:-}" == "--rebuild" ]]; then
-  shift
-  BUILD=1
-elif ! container image inspect "$IMAGE_NAME" &>/dev/null; then
-  BUILD=1
-fi
+if [[ "${1:-}" == "--rebuild" ]]; then shift; REBUILD=1; fi
 
-if [[ "${BUILD:-0}" == "1" ]]; then
+if [[ "${REBUILD:-}" == 1 ]] || ! container image inspect "$IMAGE_NAME" &>/dev/null; then
   echo "Building $IMAGE_NAME image..."
-  cp "$HOME/.config/git/config" "$SCRIPT_DIR/gitconfig"
-  cp "$HOME/.config/git/ignore" "$SCRIPT_DIR/gitignore"
-  container build --no-cache -t "$IMAGE_NAME" --memory 4G "$SCRIPT_DIR"
+  container build -t "$IMAGE_NAME" --memory 4G "$SCRIPT_DIR"
 fi
 
-# Read env vars from host Claude settings
+# Forward the GitHub token from the host keychain. This is the one secret that
+# can't be mounted (it lives in the macOS keychain, not in ~/.config/gh), and it
+# powers both `gh` and `git push` via gh's credential helper. Other env vars from
+# settings.json don't need forwarding — Claude reads them from the mounted config.
 ENV_FLAGS=()
-SETTINGS_FILE="$HOME/.config/claude/settings.json"
-if [[ -f "$SETTINGS_FILE" ]]; then
-  while IFS='=' read -r key value; do
-    ENV_FLAGS+=(--env "$key=$value")
-  done < <(jq -r '.env // {} | to_entries[] | "\(.key)=\(.value)"' "$SETTINGS_FILE")
-fi
-
-# Forward GitHub token from host keychain
 GH_TOKEN="$(gh auth token 2>/dev/null || true)"
 if [[ -n "$GH_TOKEN" ]]; then
   ENV_FLAGS+=(--env "GH_TOKEN=$GH_TOKEN")
@@ -37,30 +25,79 @@ fi
 # Run the container
 CONTAINER_HOME="/home/agent"
 
-mkdir -p "$SCRIPT_DIR/nvim"
+# Host config + resource dirs, mounted live so the container always matches the host.
+# Format: host_path:container_path[:opts] — each entry is skipped if the host path is absent.
+MOUNT_SPECS=(
+  "$HOME/.config/claude:$CONTAINER_HOME/.config/claude"
+  "$HOME/.config/git:$CONTAINER_HOME/.config/git:ro"
+  "$HOME/.config/gh:$CONTAINER_HOME/.config/gh:ro"
+  "$HOME/.config/prismic:$CONTAINER_HOME/.config/prismic"
+  "$HOME/.config/claude/skills:$CONTAINER_HOME/.claude/skills"
+  "$HOME/.agents:$CONTAINER_HOME/.agents:ro"
+  "$HOME/projects/prismic/.github:$HOME/projects/prismic/.github:ro"
+)
 
-# PR template repo referenced by global CLAUDE.md
-PRISMIC_GITHUB_MOUNT=()
-if [[ -d "$HOME/projects/prismic/.github" ]]; then
-  PRISMIC_GITHUB_MOUNT=(-v "$HOME/projects/prismic/.github:$HOME/projects/prismic/.github:ro")
-fi
+MOUNT_FLAGS=()
+for spec in "${MOUNT_SPECS[@]}"; do
+  [[ -e "${spec%%:*}" ]] && MOUNT_FLAGS+=(-v "$spec")
+done
 
-PRISMIC_CONFIG_MOUNT=()
-if [[ -d "$HOME/.config/prismic" ]]; then
-  PRISMIC_CONFIG_MOUNT=(-v "$HOME/.config/prismic:$CONTAINER_HOME/.config/prismic")
-fi
+# --- Container-aware port publishing -----------------------------------------
+# CONTAINER_PORTS is the single source of truth for ports exposed to the host.
+# Each gets a free host port (scanning up from 30000), so concurrent claudec
+# sessions never collide. Add/remove ports here and everything else follows.
+CONTAINER_PORTS=(3000 5173)
 
-exec container run -it --rm --init --progress none --memory 2G \
+host_port_in_use() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
+
+PORT_FLAGS=()
+MAPPINGS=()
+PROMPT_LINES=()
+HOST_PORTS=()
+hport=30000
+for cport in "${CONTAINER_PORTS[@]}"; do
+  while host_port_in_use "$hport"; do hport=$((hport + 1)); done
+  PORT_FLAGS+=(-p "${hport}:${cport}")
+  MAPPINGS+=("${cport}=>localhost:${hport}")
+  PROMPT_LINES+=("- container :${cport}  ->  open on host at http://localhost:${hport}")
+  HOST_PORTS+=("$hport")
+  hport=$((hport + 1))
+done
+
+CLAUDEC_PORTS="$(IFS=,; echo "${MAPPINGS[*]}")"
+PROMPT_PORTS="$(printf '%s\n' "${PROMPT_LINES[@]}")"
+
+read -r -d '' CLAUDEC_CONTEXT <<EOF || true
+<container-environment>
+You are running inside an isolated Apple 'container' (Linux) sandbox started by the
+'claudec' wrapper — not on the host macOS machine. The host 'container' CLI is not
+available to you.
+
+Only these container ports are reachable from the host:
+${PROMPT_PORTS}
+
+Rules:
+- Bind dev servers to 0.0.0.0 and ONLY to a container port listed above. If a tool
+  defaults to a different port, override it to a listed one, or the user can't reach it.
+- When you tell the user a URL to open, ALWAYS give the HOST port, never the container
+  port. Dev tools print the container port (e.g. Vite shows "Local: http://localhost:${CONTAINER_PORTS[0]}").
+  Translate it: ${CONTAINER_PORTS[0]} on the container -> tell the user http://localhost:${HOST_PORTS[0]}.
+- Re-check the live mapping anytime with: echo "\$CLAUDEC_PORTS"
+</container-environment>
+EOF
+
+container run -it --rm --init --progress none --memory 8G --cpus 4 \
   --env HOME="$CONTAINER_HOME" \
   --env CLAUDE_CONFIG_DIR="$CONTAINER_HOME/.config/claude" \
+  --env CLAUDEC=1 \
+  --env CLAUDEC_PORTS="$CLAUDEC_PORTS" \
   "${ENV_FLAGS[@]}" \
+  "${PORT_FLAGS[@]}" \
   -v "$(pwd):$(pwd)" \
   -w "$(pwd)" \
-  -v "$HOME/.config/claude:$CONTAINER_HOME/.config/claude" \
-  -v "$SCRIPT_DIR/nvim:$CONTAINER_HOME/.local/share/nvim" \
-  "${PRISMIC_GITHUB_MOUNT[@]}" \
-  "${PRISMIC_CONFIG_MOUNT[@]}" \
+  "${MOUNT_FLAGS[@]}" \
   -u agent \
   "$IMAGE_NAME" \
   claude --dangerously-skip-permissions \
+  --append-system-prompt "$CLAUDEC_CONTEXT" \
   "$@"
