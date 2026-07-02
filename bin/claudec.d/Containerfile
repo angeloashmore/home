@@ -25,6 +25,13 @@ RUN echo '#!/bin/bash' > /usr/local/bin/pbcopy && \
     chmod +x /usr/local/bin/pbcopy && \
     ln -s /usr/local/bin/pbcopy /usr/local/bin/xclip
 
+# `open` shim — forwards to the macOS host's `open` via the claudec bridge.
+# Shadows the real xdg-open on PATH; xdg-open is pointed at it too so tools that
+# call xdg-open (browsers, etc.) also reach the host.
+COPY open /usr/local/bin/open
+RUN chmod +x /usr/local/bin/open && \
+    ln -sf /usr/local/bin/open /usr/local/bin/xdg-open
+
 # Create agent user
 RUN useradd -m -s /bin/bash agent
 
@@ -36,6 +43,11 @@ RUN printf '[url "https://github.com/"]\n\tinsteadOf = git@github.com:\n\tinstea
 ENV EDITOR=vim
 ENV TERM=xterm-256color
 ENV PATH="/home/agent/.local/bin:${PATH}"
+
+# Route Claude's own URL-opening (links, docs, login pages) through the host
+# `open` shim. Without BROWSER set, Claude detects headless Linux (no DISPLAY)
+# and won't open a URL at all; pointing it at the shim forwards it to the Mac.
+ENV BROWSER=/usr/local/bin/open
 
 # Point Puppeteer / chrome-devtools-mcp at the system Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium

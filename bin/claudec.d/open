@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+#
+# claudec `open` shim.
+#
+# Installed at /usr/local/bin/open (ahead of the real xdg-open on PATH). Drops a
+# request file into the per-session spool dir that claudec mounts from the host;
+# the host-side watcher (open_watch in `claudec`) runs the real macOS `open`.
+#
+# Only http(s) URLs and files under this session's working dirs are honoured;
+# that policy is enforced host-side. This shim just forwards and reports back.
+#
+set -uo pipefail
+
+fail() { echo "open: $*" >&2; exit 1; }
+
+[[ $# -ge 1 ]] || fail "usage: open <file|URL>"
+
+spool="${CLAUDEC_OPEN_SPOOL:-}"
+[[ -n "$spool" && -d "$spool" ]] || \
+  fail "host bridge not enabled for this session (nothing to forward to)"
+
+target="$1"
+
+# Translate container dev-server ports -> the host-published ports, so
+# `open http://localhost:3000` opens the right thing on the Mac.
+# CLAUDEC_PORTS looks like: 3000=>localhost:30006,5173=>localhost:30007
+if [[ -n "${CLAUDEC_PORTS:-}" ]]; then
+  IFS=',' read -ra _maps <<< "$CLAUDEC_PORTS"
+  for _m in "${_maps[@]}"; do
+    cport="${_m%%=>*}"
+    hport="${_m##*:}"
+    [[ "$cport" =~ ^[0-9]+$ && "$hport" =~ ^[0-9]+$ ]] || continue
+    target="$(printf '%s' "$target" \
+      | sed -E "s#(localhost|127\.0\.0\.1):${cport}\b#localhost:${hport}#g")"
+  done
+fi
+
+# Resolve a local file path to an absolute one. claudec mounts working dirs at
+# identical host paths, so the resolved path is valid on the host as well.
+if [[ "$target" != *://* && -e "$target" ]]; then
+  target="$(realpath "$target" 2>/dev/null || echo "$target")"
+fi
+
+# Hand the request off atomically: write to a temp file, then rename it into
+# place so the watcher never reads a half-written request.
+tmp="$(mktemp "$spool/.tmp.XXXXXX")" || fail "could not write to the spool"
+printf '%s' "$target" > "$tmp"
+id="${tmp##*/.tmp.}"
+mv -f "$tmp" "$spool/req.$id"
+
+# Wait for the watcher's reply so we can mirror the host's result: silent +
+# exit 0 on success, message + exit 1 on failure — like a native `open`.
+resp="$spool/resp.$id"
+for ((i = 0; i < 100; i++)); do
+  if [[ -s "$resp" ]]; then
+    status="$(cat "$resp")"
+    rm -f "$resp"
+    [[ "$status" == "ok" ]] && exit 0
+    fail "$status"
+  fi
+  sleep 0.1
+done
+# No reply in ~10s — the bridge isn't answering. Report failure rather than a
+# false success (a real `open` never silently no-ops).
+rm -f "$spool/req.$id"
+fail "no response from the host bridge (is claudec still running?)"

@@ -126,6 +126,9 @@ Rules:
   port. Dev tools print the container port (e.g. Vite shows "Local: http://localhost:${CONTAINER_PORTS[0]}").
   Translate it: ${CONTAINER_PORTS[0]} on the container -> tell the user http://localhost:${HOST_PORTS[0]}.
 - Re-check the live mapping anytime with: echo "\$CLAUDEC_PORTS"
+- 'open <http(s)-URL | file>' works and runs on the host Mac. Container dev-server
+  ports are auto-translated, so 'open http://localhost:${CONTAINER_PORTS[0]}' opens the right tab.
+  Only http(s) URLs and files under the working dir are allowed.
 </container-environment>
 EOF
 
@@ -152,6 +155,7 @@ CWD="$(pwd)"
 SCOPE_DIRS=()         # inside-CWD dirs that scope the working dir
 EXTRA_MOUNT_FLAGS=()  # -v flags for outside-CWD dirs
 EXTRA_CLAUDE_FLAGS=() # --add-dir flags for outside-CWD dirs
+EXTRA_DIRS=()         # host paths of outside-CWD dirs (for the open allowlist)
 for dir in ${ADD_DIRS[@]+"${ADD_DIRS[@]}"}; do
   if [[ ! -d "$dir" ]]; then
     echo "claudec: --add-dir: no such directory: $dir" >&2
@@ -165,6 +169,7 @@ for dir in ${ADD_DIRS[@]+"${ADD_DIRS[@]}"}; do
   else
     EXTRA_MOUNT_FLAGS+=(-v "$abs:$abs")
     EXTRA_CLAUDE_FLAGS+=(--add-dir "$abs")
+    EXTRA_DIRS+=("$abs")
   fi
 done
 
@@ -197,14 +202,100 @@ else
   CWD_MOUNT_FLAGS+=(-v "$CWD:$CWD")
 fi
 
+# --- Host `open` bridge -------------------------------------------------------
+# Give the container a working `open` that runs on the Mac. We create a private
+# per-session spool dir, mount it into the container, and run a tiny watcher here
+# on the host that turns request files (dropped by the in-container `open` shim)
+# into real `open` calls. It's torn down when this session exits (trap below),
+# so nothing lingers and concurrent claudec sessions in other tabs each get their
+# own spool and never clash. Only http(s) URLs and files under the mounted
+# working dirs are honoured — the container is untrusted, so that's enforced here.
+#
+# open_report <target> — runs the real macOS `open` and echoes "ok" on success
+# or its actual error text on failure, so the container's `open` can report the
+# true result (and exit non-zero) the way a native `open` would.
+open_report() {
+  local out
+  if out="$(open "$1" 2>&1)"; then
+    printf 'ok'
+  else
+    printf '%s' "${out:-could not open \"$1\"}"
+  fi
+}
+
+# open_watch <spool_dir> <allowed_root>...  — runs in the background for the
+# session; polls the spool and writes a resp.<id> reply for each req.<id>.
+open_watch() {
+  local spool="$1"; shift
+  local roots=() r
+  for r in "$@"; do roots+=("$(cd "$r" 2>/dev/null && pwd -P)"); done
+  local parent=$$ f id target rp ok reply
+  while [[ -d "$spool" ]] && kill -0 "$parent" 2>/dev/null; do
+    for f in "$spool"/req.*; do
+      [[ -e "$f" ]] || continue
+      id="${f##*/req.}"
+      target="$(cat "$f")"
+      rm -f "$f"
+      case "$target" in
+        http://*|https://*)
+          reply="$(open_report "$target")" ;;
+        *://*)
+          reply="refused: only http(s) URLs are allowed" ;;
+        *)
+          # Canonicalize without depending on `realpath` (absent on older macOS);
+          # cd+pwd -P also collapses any ../ escape before the allowlist check.
+          rp="$(cd "$(dirname "$target")" 2>/dev/null \
+                && printf '%s/%s' "$(pwd -P)" "$(basename "$target")")"
+          ok=""
+          for r in "${roots[@]}"; do
+            [[ -n "$r" && ( "$rp" == "$r" || "$rp" == "$r"/* ) ]] && ok=1 && break
+          done
+          if [[ -n "$ok" && -e "$rp" ]]; then
+            reply="$(open_report "$rp")"
+          else
+            reply="refused: only files under the session's working dirs are allowed"
+          fi ;;
+      esac
+      # Write the reply atomically (temp + rename) so the shim never reads a
+      # half-written or still-empty resp file while `open` is mid-flight.
+      printf '%s' "$reply" > "$spool/.resp.$id" \
+        && mv -f "$spool/.resp.$id" "$spool/resp.$id"
+    done
+    sleep 0.5
+  done
+}
+
+OPEN_ENV_FLAGS=()
+OPEN_MOUNT_FLAGS=()
+OPEN_SPOOL="$(mktemp -d "${TMPDIR:-/tmp}/claudec-open.XXXXXX" 2>/dev/null || true)"
+if [[ -n "$OPEN_SPOOL" && -d "$OPEN_SPOOL" ]]; then
+  OPEN_ROOTS=()
+  if [[ ${#SCOPE_DIRS[@]} -gt 0 ]]; then
+    OPEN_ROOTS+=("${SCOPE_DIRS[@]}")
+  else
+    OPEN_ROOTS+=("$CWD")
+  fi
+  OPEN_ROOTS+=(${EXTRA_DIRS[@]+"${EXTRA_DIRS[@]}"})
+
+  open_watch "$OPEN_SPOOL" "${OPEN_ROOTS[@]}" &
+  OPEN_PID=$!
+  trap 'kill "$OPEN_PID" 2>/dev/null; rm -rf "$OPEN_SPOOL"' EXIT INT TERM
+  OPEN_MOUNT_FLAGS+=(-v "$OPEN_SPOOL:$OPEN_SPOOL")
+  OPEN_ENV_FLAGS+=(--env "CLAUDEC_OPEN_SPOOL=$OPEN_SPOOL")
+else
+  echo "claudec: could not create the open-bridge spool; 'open' inside the container will be disabled." >&2
+fi
+
 container run -it --rm --init --progress none --memory 8G --cpus 4 \
   --env HOME="$CONTAINER_HOME" \
   --env CLAUDE_CONFIG_DIR="$CONTAINER_HOME/.config/claude" \
   --env CLAUDEC=1 \
   --env CLAUDEC_PORTS="$CLAUDEC_PORTS" \
   ${ENV_FLAGS[@]+"${ENV_FLAGS[@]}"} \
+  ${OPEN_ENV_FLAGS[@]+"${OPEN_ENV_FLAGS[@]}"} \
   "${PORT_FLAGS[@]}" \
   ${EXTRA_MOUNT_FLAGS[@]+"${EXTRA_MOUNT_FLAGS[@]}"} \
+  ${OPEN_MOUNT_FLAGS[@]+"${OPEN_MOUNT_FLAGS[@]}"} \
   "${CWD_MOUNT_FLAGS[@]}" \
   -w "$(pwd)" \
   ${MOUNT_FLAGS[@]+"${MOUNT_FLAGS[@]}"} \
