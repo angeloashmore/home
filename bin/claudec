@@ -4,9 +4,52 @@ set -euo pipefail
 IMAGE_NAME="claudec"
 SCRIPT_DIR="$(cd "$(dirname "$0")/claudec.d" && pwd)"
 
-# Rebuild on explicit --rebuild, or if the image doesn't exist yet
-if [[ "${1:-}" == "--rebuild" ]]; then shift; REBUILD=1; fi
+# --- Argument parsing --------------------------------------------------------
+# claudec owns a few flags and forwards everything else to `claude`:
+#   --rebuild        rebuild the container image before launching
+#   --add-dir, -a <dir>
+#                    Repeatable; paths resolve relative to the CWD. Behavior
+#                    depends on where <dir> sits:
+#                      * inside the CWD  -> SCOPES the working dir to just the
+#                        named subdir(s); the rest of the CWD is not mounted.
+#                      * outside the CWD -> mounted at its host path and
+#                        registered with claude as an extra working directory.
+#   --skip-git-check proceed even when scoping leaves the repo's .git unmounted.
+REBUILD=""
+SKIP_GIT_CHECK=""
+ADD_DIRS=()
+PASSTHROUGH=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --rebuild)
+      REBUILD=1
+      shift
+      ;;
+    --skip-git-check)
+      SKIP_GIT_CHECK=1
+      shift
+      ;;
+    --add-dir|-a)
+      shift
+      if [[ $# -eq 0 || "$1" == -* ]]; then
+        echo "claudec: --add-dir requires a directory argument" >&2
+        exit 1
+      fi
+      ADD_DIRS+=("$1")
+      shift
+      ;;
+    --add-dir=*)
+      ADD_DIRS+=("${1#*=}")
+      shift
+      ;;
+    *)
+      PASSTHROUGH+=("$1")
+      shift
+      ;;
+  esac
+done
 
+# Rebuild on explicit --rebuild, or if the image doesn't exist yet
 if [[ "${REBUILD:-}" == 1 ]] || ! container image inspect "$IMAGE_NAME" &>/dev/null; then
   echo "Building $IMAGE_NAME image..."
   container build -t "$IMAGE_NAME" --memory 4G "$SCRIPT_DIR"
@@ -86,18 +129,88 @@ Rules:
 </container-environment>
 EOF
 
+# --- Working-directory scoping & extra dirs (--add-dir) -----------------------
+# Requested dirs are split by where they sit relative to the CWD:
+#
+#   * Inside the CWD (below it): these SCOPE the working directory. As soon as one
+#     is given, the whole CWD is no longer mounted — only the named subdirs are, so
+#     the container sees just those. They live under the CWD, so claude already
+#     treats them as part of the working dir; no --add-dir needed.
+#   * Outside the CWD (anywhere else): these are ADDITIVE. Each is bind-mounted at
+#     its host path and registered with claude via --add-dir.
+#
+#   no dirs                -> whole CWD
+#   only inside dirs       -> just those subdirs (CWD scoped down)
+#   only outside dirs      -> whole CWD + the outside dirs
+#   inside + outside dirs  -> just the inside subdirs + the outside dirs
+#
+# Caveat: scoping only mounts the named subdirs, so a .git (or any root-level
+# config) that lives at the CWD root is NOT visible. Scope only to self-contained
+# subdirs (e.g. independent repos), not packages of a monorepo whose git/config
+# lives above them.
+CWD="$(pwd)"
+SCOPE_DIRS=()         # inside-CWD dirs that scope the working dir
+EXTRA_MOUNT_FLAGS=()  # -v flags for outside-CWD dirs
+EXTRA_CLAUDE_FLAGS=() # --add-dir flags for outside-CWD dirs
+for dir in ${ADD_DIRS[@]+"${ADD_DIRS[@]}"}; do
+  if [[ ! -d "$dir" ]]; then
+    echo "claudec: --add-dir: no such directory: $dir" >&2
+    exit 1
+  fi
+  abs="$(cd "$dir" && pwd)"
+  if [[ "$abs" == "$CWD" ]]; then
+    echo "claudec: --add-dir: $dir is the working directory; ignoring" >&2
+  elif [[ "$abs" == "$CWD"/* ]]; then
+    SCOPE_DIRS+=("$abs")
+  else
+    EXTRA_MOUNT_FLAGS+=(-v "$abs:$abs")
+    EXTRA_CLAUDE_FLAGS+=(--add-dir "$abs")
+  fi
+done
+
+# When scoping replaces the full CWD mount, a .git at the CWD root is left out,
+# so git/gh stop working inside the container. If that's about to happen, stop —
+# unless the .git was explicitly scoped in (-a .git) or the check is skipped.
+if [[ ${#SCOPE_DIRS[@]} -gt 0 && -z "$SKIP_GIT_CHECK" && -e "$CWD/.git" ]]; then
+  git_scoped=""
+  for d in "${SCOPE_DIRS[@]}"; do
+    if [[ "$d" == "$CWD/.git" ]]; then
+      git_scoped=1
+      break
+    fi
+  done
+  if [[ -z "$git_scoped" ]]; then
+    echo "claudec: scoping leaves this repo's .git ($CWD/.git) unmounted." >&2
+    echo "claudec: git and gh won't work inside the container." >&2
+    echo "claudec: include it with '-a .git', or pass --skip-git-check to proceed without git." >&2
+    exit 1
+  fi
+fi
+
+# Mount the whole CWD by default, or just the requested subdirs when scoping.
+CWD_MOUNT_FLAGS=()
+if [[ ${#SCOPE_DIRS[@]} -gt 0 ]]; then
+  for d in "${SCOPE_DIRS[@]}"; do
+    CWD_MOUNT_FLAGS+=(-v "$d:$d")
+  done
+else
+  CWD_MOUNT_FLAGS+=(-v "$CWD:$CWD")
+fi
+
 container run -it --rm --init --progress none --memory 8G --cpus 4 \
   --env HOME="$CONTAINER_HOME" \
   --env CLAUDE_CONFIG_DIR="$CONTAINER_HOME/.config/claude" \
   --env CLAUDEC=1 \
   --env CLAUDEC_PORTS="$CLAUDEC_PORTS" \
-  "${ENV_FLAGS[@]}" \
+  ${ENV_FLAGS[@]+"${ENV_FLAGS[@]}"} \
   "${PORT_FLAGS[@]}" \
-  -v "$(pwd):$(pwd)" \
+  ${EXTRA_MOUNT_FLAGS[@]+"${EXTRA_MOUNT_FLAGS[@]}"} \
+  "${CWD_MOUNT_FLAGS[@]}" \
   -w "$(pwd)" \
-  "${MOUNT_FLAGS[@]}" \
+  ${MOUNT_FLAGS[@]+"${MOUNT_FLAGS[@]}"} \
   -u agent \
   "$IMAGE_NAME" \
   claude --dangerously-skip-permissions \
   --append-system-prompt "$CLAUDEC_CONTEXT" \
-  "$@"
+  ${EXTRA_CLAUDE_FLAGS[@]+"${EXTRA_CLAUDE_FLAGS[@]}"} \
+  ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
