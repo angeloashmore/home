@@ -39,7 +39,7 @@ vim.api.nvim_create_autocmd("CursorMoved", {
 	end,
 })
 
-local augroup = vim.api.nvim_create_augroup("angeloashmore.cfg", { clear = true })
+local augroup = vim.api.nvim_create_augroup("user.cfg", { clear = true })
 local autocmd = vim.api.nvim_create_autocmd
 
 local function setup_lsp()
