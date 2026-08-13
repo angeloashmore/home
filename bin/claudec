@@ -84,7 +84,10 @@ MOUNT_SPECS=(
   "$HOME/.config/.wrangler:$CONTAINER_HOME/.config/.wrangler"
   "$HOME/.config/claude/skills:$CONTAINER_HOME/.claude/skills"
   "$HOME/.agents:$CONTAINER_HOME/.agents:ro"
+  # Mounted at both homes so "~/projects/prismic/.github" in CLAUDE.md resolves
+  # on the host and in the container (where ~ is $CONTAINER_HOME, not $HOME).
   "$HOME/projects/prismic/.github:$HOME/projects/prismic/.github:ro"
+  "$HOME/projects/prismic/.github:$CONTAINER_HOME/projects/prismic/.github:ro"
 )
 
 MOUNT_FLAGS=()
