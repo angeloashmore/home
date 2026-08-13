@@ -49,8 +49,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Rebuild on explicit --rebuild, or if the image doesn't exist yet
-if [[ "${REBUILD:-}" == 1 ]] || ! container image inspect "$IMAGE_NAME" &>/dev/null; then
+# Rebuild on explicit --rebuild, or if the image doesn't exist yet.
+# --rebuild busts the Claude Code install layer (via CLAUDE_CACHEBUST) so the
+# latest version is always fetched; the base layers stay cached.
+if [[ "${REBUILD:-}" == 1 ]]; then
+  echo "Building $IMAGE_NAME image (fresh Claude Code install)..."
+  container build -t "$IMAGE_NAME" --memory 4G \
+    --build-arg "CLAUDE_CACHEBUST=$(date +%s)" "$SCRIPT_DIR"
+elif ! container image inspect "$IMAGE_NAME" &>/dev/null; then
   echo "Building $IMAGE_NAME image..."
   container build -t "$IMAGE_NAME" --memory 4G "$SCRIPT_DIR"
 fi
@@ -75,6 +81,7 @@ MOUNT_SPECS=(
   "$HOME/.config/git:$CONTAINER_HOME/.config/git:ro"
   "$HOME/.config/gh:$CONTAINER_HOME/.config/gh:ro"
   "$HOME/.config/prismic:$CONTAINER_HOME/.config/prismic"
+  "$HOME/.config/.wrangler:$CONTAINER_HOME/.config/.wrangler"
   "$HOME/.config/claude/skills:$CONTAINER_HOME/.claude/skills"
   "$HOME/.agents:$CONTAINER_HOME/.agents:ro"
   "$HOME/projects/prismic/.github:$HOME/projects/prismic/.github:ro"

@@ -55,4 +55,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=1
 
 # Claude Code
 USER agent
-RUN curl -fsSL https://claude.ai/install.sh | bash
+# CLAUDE_CACHEBUST invalidates only this layer; claudec --rebuild passes a
+# fresh value so the install re-runs without rebuilding the base layers above.
+ARG CLAUDE_CACHEBUST=0
+RUN echo "cachebust=$CLAUDE_CACHEBUST" && curl -fsSL https://claude.ai/install.sh | bash
