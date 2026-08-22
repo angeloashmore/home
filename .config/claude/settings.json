@@ -1,10 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
-    "DISABLE_AUTOUPDATER": "1",
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
   "model": "claude-fable-5[1m]",
+  "outputStyle": "Concise",
   "hooks": {
     "Notification": [
       {
@@ -29,12 +29,15 @@
       }
     ]
   },
+  "disableArtifact": true,
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
+  "verbose": false,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754084788882
