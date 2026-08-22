@@ -17,15 +17,14 @@ RUN install -m 0755 -d /etc/apt/keyrings \
   && apt-get update && apt-get install -y --no-install-recommends gh \
   && rm -rf /var/lib/apt/lists/*
 
-# pbcopy/xclip via OSC 52
+# pbcopy via OSC 52
 RUN echo '#!/bin/bash' > /usr/local/bin/pbcopy && \
     echo 'printf "\e]52;c;%s\a" "$(base64 | tr -d "\n")" > /dev/tty' >> /usr/local/bin/pbcopy && \
-    chmod +x /usr/local/bin/pbcopy && \
-    ln -s /usr/local/bin/pbcopy /usr/local/bin/xclip
+    chmod +x /usr/local/bin/pbcopy
 
-# `open` forwards to the host Mac via the claudec bridge
-COPY open /usr/local/bin/open
-RUN chmod +x /usr/local/bin/open && \
+# `open` and `xclip` (clipboard paste) forward to the host Mac via the claudec bridge
+COPY open xclip /usr/local/bin/
+RUN chmod +x /usr/local/bin/open /usr/local/bin/xclip && \
     ln -sf /usr/local/bin/open /usr/local/bin/xdg-open
 
 RUN useradd -m -s /bin/bash agent \

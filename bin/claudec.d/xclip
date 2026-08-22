@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# claudec xclip shim. Claude Code pastes via `xclip -selection clipboard -t <mime> -o`;
+# read mode round-trips to the host clipboard through the session spool.
+# Write mode is OSC 52, like pbcopy.
+set -uo pipefail
+
+[[ " $*" == *" -o"* ]] || exec pbcopy
+mime=text/plain
+while [[ $# -gt 0 ]]; do [[ "$1" == -t && $# -ge 2 ]] && mime="$2"; shift; done
+
+spool="${CLAUDEC_OPEN_SPOOL:-}"
+[[ -d "$spool" ]] || exit 1
+tmp="$(mktemp "$spool/.tmp.XXXXXX")" || exit 1
+printf '%s' "$mime" > "$tmp"
+req="$spool/clip.${tmp##*/.tmp.}"
+mv -f "$tmp" "$req"
+for _ in {1..50}; do
+  if [[ -e "$req.out" ]]; then
+    [[ -s "$req.out" ]] && cat "$req.out"; s=$?
+    rm -f "$req.out"; exit "$s"
+  fi
+  sleep 0.1
+done
+rm -f "$req"
+exit 1

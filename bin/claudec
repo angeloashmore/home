@@ -57,6 +57,9 @@ MOUNTS=(
   # both homes, so "~/projects/prismic/.github" resolves on host and in container
   "$HOME/projects/prismic/.github:$HOME/projects/prismic/.github:ro"
   "$HOME/projects/prismic/.github:$AGENT_HOME/projects/prismic/.github:ro"
+  # screenshots, both homes, so dragged file paths resolve in the container
+  "$HOME/Screenshots:$HOME/Screenshots:ro"
+  "$HOME/Screenshots:$AGENT_HOME/Screenshots:ro"
 )
 
 CLAUDE_FLAGS=()
@@ -75,29 +78,46 @@ for m in "${MOUNTS[@]}"; do
   if [[ -e "${m%%:*}" ]]; then MOUNT_FLAGS+=(-v "$m"); fi
 done
 
-# `open` bridge: the in-container shim drops request files here; this watcher
-# runs the real macOS `open`. Only http(s) URLs and files under the session's
-# working dirs are honoured.
+# host bridge: in-container shims drop request files here; this watcher acts
+# on the host. req.* -> `open` (http(s) URLs and files under the session's
+# working dirs only); clip.* -> clipboard read (mime type in the file, bytes out).
 SPOOL="$(mktemp -d "${TMPDIR:-/tmp}/claudec-open.XXXXXX")"
 
 open_watch() {
   local r p f t roots=()
   for r in "${OPEN_ROOTS[@]}"; do roots+=("$(cd "$r" && pwd -P)"); done
   while [[ -d "$SPOOL" ]] && kill -0 $$ 2>/dev/null; do
-    for f in "$SPOOL"/req.*; do
+    for f in "$SPOOL"/req.* "$SPOOL"/clip.*; do
       [[ -e "$f" ]] || continue
+      case "$f" in *.out) continue ;; esac
       t="$(cat "$f")"; rm -f "$f"
-      case "$t" in
-        http://*|https://*) open "$t" || true ;;
-        *://*) ;;
+      case "$f" in
+        "$SPOOL"/clip.*)
+          case "$t" in
+            TARGETS) # claude probes for an image before pasting
+              { osascript -e 'clipboard info' 2>/dev/null | grep -qE 'PNGf|TIFF' \
+                  && printf 'image/png\n' > "$f.tmp"; } || : > "$f.tmp" ;;
+            image/png)
+              osascript -e "set f to open for access POSIX file \"$f.tmp\" with write permission" \
+                        -e 'write (the clipboard as «class PNGf») to f' \
+                        -e 'close access f' >/dev/null 2>&1 || : > "$f.tmp" ;;
+            text/*) pbpaste > "$f.tmp" 2>/dev/null || : > "$f.tmp" ;;
+            *) : > "$f.tmp" ;;
+          esac
+          mv -f "$f.tmp" "$f.out" ;;
         *)
-          p="$(cd "$(dirname "$t")" 2>/dev/null && printf '%s/%s' "$(pwd -P)" "$(basename "$t")")" || continue
-          for r in "${roots[@]}"; do
-            [[ "$p" == "$r" || "$p" == "$r"/* ]] && { open "$p" || true; break; }
-          done ;;
+          case "$t" in
+            http://*|https://*) open "$t" || true ;;
+            *://*) ;;
+            *)
+              p="$(cd "$(dirname "$t")" 2>/dev/null && printf '%s/%s' "$(pwd -P)" "$(basename "$t")")" || continue
+              for r in "${roots[@]}"; do
+                [[ "$p" == "$r" || "$p" == "$r"/* ]] && { open "$p" || true; break; }
+              done ;;
+          esac ;;
       esac
     done
-    sleep 0.5
+    sleep 0.1
   done
 }
 
@@ -120,13 +140,17 @@ Published ports (container => host): $CLAUDEC_PORTS
 - Bind dev servers to 0.0.0.0 on a published container port; if a tool defaults to another port, override it.
 - Give the user the matching http://localhost:<host port> URL, never the container port. Live mapping: echo \$CLAUDEC_PORTS
 - 'open <http(s)-URL | file>' runs on the host Mac; published localhost ports are translated. Files must be under the session's working dirs.
+- Ctrl+V pastes the user's host clipboard, including screenshot images (xclip bridges to the host).
+- ~/Screenshots is mounted read-only; the user's newest screenshot lands there a few seconds after capture. A dragged /var/folders/... thumbnail path never exists (macOS deletes it) — Read the matching file in ~/Screenshots instead.
 </container-environment>"
 
+# DISPLAY: no X server exists; claude only attempts the xclip clipboard bridge when it is set
 container run -it --rm --init --progress none --memory 8G --cpus 4 \
   --name "$NAME" \
   --env HOME="$AGENT_HOME" \
   --env CLAUDE_CONFIG_DIR="$AGENT_HOME/.config/claude" \
   --env CLAUDEC=1 \
+  --env DISPLAY=:0 \
   --env CLAUDEC_PORTS="$CLAUDEC_PORTS" \
   --env CLAUDEC_OPEN_SPOOL="$SPOOL" \
   ${ENV_FLAGS[@]+"${ENV_FLAGS[@]}"} \
