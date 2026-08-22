@@ -160,7 +160,7 @@ container run -it --rm --init --progress none --memory 8G --cpus 4 \
   -w "$CWD" \
   -u agent \
   "$IMAGE" \
-  claude --dangerously-skip-permissions \
+  claude --permission-mode auto \
   --append-system-prompt "$CONTEXT" \
   ${CLAUDE_FLAGS[@]+"${CLAUDE_FLAGS[@]}"} \
   ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
