@@ -1,317 +1,142 @@
 #!/usr/bin/env bash
+# usage: claudec [-a <dir>]... [claude args...]
+#   -a, --add-dir <dir>  mount an extra directory and register it with claude
+#
+# rebuild image:  container image rm claudec   (rebuilds on next run)
+# claude updates itself; the install persists in ~/.local/share/claudec
 set -euo pipefail
 
-IMAGE_NAME="claudec"
+IMAGE=claudec
 SCRIPT_DIR="$(cd "$(dirname "$0")/claudec.d" && pwd)"
+AGENT_HOME=/home/agent
+CWD="$(pwd)"
+BASE="$(basename "$CWD" | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]/-/g' -e 's/^-*//')"
+NAME="$BASE"
+n=2
+while container list --all --quiet | grep -qxF "$NAME"; do NAME="$BASE-$n"; n=$((n + 1)); done
 
-# --- Argument parsing --------------------------------------------------------
-# claudec owns a few flags and forwards everything else to `claude`:
-#   --rebuild        rebuild the container image before launching
-#   --add-dir, -a <dir>
-#                    Repeatable; paths resolve relative to the CWD. Behavior
-#                    depends on where <dir> sits:
-#                      * inside the CWD  -> SCOPES the working dir to just the
-#                        named subdir(s); the rest of the CWD is not mounted.
-#                      * outside the CWD -> mounted at its host path and
-#                        registered with claude as an extra working directory.
-#   --skip-git-check proceed even when scoping leaves the repo's .git unmounted.
-REBUILD=""
-SKIP_GIT_CHECK=""
 ADD_DIRS=()
 PASSTHROUGH=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --rebuild)
-      REBUILD=1
-      shift
-      ;;
-    --skip-git-check)
-      SKIP_GIT_CHECK=1
-      shift
-      ;;
     --add-dir|-a)
-      shift
-      if [[ $# -eq 0 || "$1" == -* ]]; then
-        echo "claudec: --add-dir requires a directory argument" >&2
-        exit 1
-      fi
-      ADD_DIRS+=("$1")
-      shift
-      ;;
-    --add-dir=*)
-      ADD_DIRS+=("${1#*=}")
-      shift
-      ;;
-    *)
-      PASSTHROUGH+=("$1")
-      shift
-      ;;
+      [[ $# -ge 2 ]] || { echo "claudec: $1 requires a directory" >&2; exit 1; }
+      ADD_DIRS+=("$2"); shift 2 ;;
+    --add-dir=*) ADD_DIRS+=("${1#*=}"); shift ;;
+    *) PASSTHROUGH+=("$1"); shift ;;
   esac
 done
 
-# Rebuild on explicit --rebuild, or if the image doesn't exist yet.
-# --rebuild busts the Claude Code install layer (via CLAUDE_CACHEBUST) so the
-# latest version is always fetched; the base layers stay cached.
-if [[ "${REBUILD:-}" == 1 ]]; then
-  echo "Building $IMAGE_NAME image (fresh Claude Code install)..."
-  container build -t "$IMAGE_NAME" --memory 4G \
-    --build-arg "CLAUDE_CACHEBUST=$(date +%s)" "$SCRIPT_DIR"
-elif ! container image inspect "$IMAGE_NAME" &>/dev/null; then
-  echo "Building $IMAGE_NAME image..."
-  container build -t "$IMAGE_NAME" --memory 4G "$SCRIPT_DIR"
+container image inspect "$IMAGE" &>/dev/null \
+  || container build -t "$IMAGE" --memory 4G "$SCRIPT_DIR"
+
+CLAUDE_DIR="$HOME/.local/share/claudec"
+if [[ ! -x "$CLAUDE_DIR/bin/claude" && ! -L "$CLAUDE_DIR/bin/claude" ]]; then
+  mkdir -p "$CLAUDE_DIR/bin" "$CLAUDE_DIR/share/claude"
+  container run --rm -u agent \
+    -v "$CLAUDE_DIR/bin:$AGENT_HOME/.local/bin" \
+    -v "$CLAUDE_DIR/share/claude:$AGENT_HOME/.local/share/claude" \
+    "$IMAGE" bash -c 'curl -fsSL https://claude.ai/install.sh | bash'
 fi
 
-# Forward the GitHub token from the host keychain. This is the one secret that
-# can't be mounted (it lives in the macOS keychain, not in ~/.config/gh), and it
-# powers both `gh` and `git push` via gh's credential helper. Other env vars from
-# settings.json don't need forwarding — Claude reads them from the mounted config.
 ENV_FLAGS=()
 GH_TOKEN="$(gh auth token 2>/dev/null || true)"
-if [[ -n "$GH_TOKEN" ]]; then
-  ENV_FLAGS+=(--env "GH_TOKEN=$GH_TOKEN")
-fi
+[[ -n "$GH_TOKEN" ]] && ENV_FLAGS+=(--env "GH_TOKEN=$GH_TOKEN")
 
-# Run the container
-CONTAINER_HOME="/home/agent"
-
-# Host config + resource dirs, mounted live so the container always matches the host.
-# Format: host_path:container_path[:opts] — each entry is skipped if the host path is absent.
-MOUNT_SPECS=(
-  "$HOME/.config/claude:$CONTAINER_HOME/.config/claude"
-  "$HOME/.config/git:$CONTAINER_HOME/.config/git:ro"
-  "$HOME/.config/gh:$CONTAINER_HOME/.config/gh:ro"
-  "$HOME/.config/prismic:$CONTAINER_HOME/.config/prismic"
-  "$HOME/.config/.wrangler:$CONTAINER_HOME/.config/.wrangler"
-  "$HOME/.config/claude/skills:$CONTAINER_HOME/.claude/skills"
-  "$HOME/.agents:$CONTAINER_HOME/.agents:ro"
-  # Mounted at both homes so "~/projects/prismic/.github" in CLAUDE.md resolves
-  # on the host and in the container (where ~ is $CONTAINER_HOME, not $HOME).
+MOUNTS=(
+  "$CWD:$CWD"
+  "$CLAUDE_DIR/bin:$AGENT_HOME/.local/bin"
+  "$CLAUDE_DIR/share/claude:$AGENT_HOME/.local/share/claude"
+  "$HOME/.config/claude:$AGENT_HOME/.config/claude"
+  "$HOME/.config/git:$AGENT_HOME/.config/git:ro"
+  "$HOME/.config/gh:$AGENT_HOME/.config/gh:ro"
+  "$HOME/.config/prismic:$AGENT_HOME/.config/prismic"
+  "$HOME/.config/.wrangler:$AGENT_HOME/.config/.wrangler"
+  "$HOME/.config/claude/skills:$AGENT_HOME/.claude/skills"
+  "$HOME/.agents:$AGENT_HOME/.agents:ro"
+  # both homes, so "~/projects/prismic/.github" resolves on host and in container
   "$HOME/projects/prismic/.github:$HOME/projects/prismic/.github:ro"
-  "$HOME/projects/prismic/.github:$CONTAINER_HOME/projects/prismic/.github:ro"
+  "$HOME/projects/prismic/.github:$AGENT_HOME/projects/prismic/.github:ro"
 )
 
-MOUNT_FLAGS=()
-for spec in "${MOUNT_SPECS[@]}"; do
-  [[ -e "${spec%%:*}" ]] && MOUNT_FLAGS+=(-v "$spec")
-done
-
-# --- Container-aware port publishing -----------------------------------------
-# CONTAINER_PORTS is the single source of truth for ports exposed to the host.
-# Each gets a free host port (scanning up from 30000), so concurrent claudec
-# sessions never collide. Add/remove ports here and everything else follows.
-CONTAINER_PORTS=(3000 5173)
-
-host_port_in_use() { lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1; }
-
-PORT_FLAGS=()
-MAPPINGS=()
-PROMPT_LINES=()
-HOST_PORTS=()
-hport=30000
-for cport in "${CONTAINER_PORTS[@]}"; do
-  while host_port_in_use "$hport"; do hport=$((hport + 1)); done
-  PORT_FLAGS+=(-p "${hport}:${cport}")
-  MAPPINGS+=("${cport}=>localhost:${hport}")
-  PROMPT_LINES+=("- container :${cport}  ->  open on host at http://localhost:${hport}")
-  HOST_PORTS+=("$hport")
-  hport=$((hport + 1))
-done
-
-CLAUDEC_PORTS="$(IFS=,; echo "${MAPPINGS[*]}")"
-PROMPT_PORTS="$(printf '%s\n' "${PROMPT_LINES[@]}")"
-
-read -r -d '' CLAUDEC_CONTEXT <<EOF || true
-<container-environment>
-You are running inside an isolated Apple 'container' (Linux) sandbox started by the
-'claudec' wrapper — not on the host macOS machine. The host 'container' CLI is not
-available to you.
-
-Only these container ports are reachable from the host:
-${PROMPT_PORTS}
-
-Rules:
-- Bind dev servers to 0.0.0.0 and ONLY to a container port listed above. If a tool
-  defaults to a different port, override it to a listed one, or the user can't reach it.
-- When you tell the user a URL to open, ALWAYS give the HOST port, never the container
-  port. Dev tools print the container port (e.g. Vite shows "Local: http://localhost:${CONTAINER_PORTS[0]}").
-  Translate it: ${CONTAINER_PORTS[0]} on the container -> tell the user http://localhost:${HOST_PORTS[0]}.
-- Re-check the live mapping anytime with: echo "\$CLAUDEC_PORTS"
-- 'open <http(s)-URL | file>' works and runs on the host Mac. Container dev-server
-  ports are auto-translated, so 'open http://localhost:${CONTAINER_PORTS[0]}' opens the right tab.
-  Only http(s) URLs and files under the working dir are allowed.
-</container-environment>
-EOF
-
-# --- Working-directory scoping & extra dirs (--add-dir) -----------------------
-# Requested dirs are split by where they sit relative to the CWD:
-#
-#   * Inside the CWD (below it): these SCOPE the working directory. As soon as one
-#     is given, the whole CWD is no longer mounted — only the named subdirs are, so
-#     the container sees just those. They live under the CWD, so claude already
-#     treats them as part of the working dir; no --add-dir needed.
-#   * Outside the CWD (anywhere else): these are ADDITIVE. Each is bind-mounted at
-#     its host path and registered with claude via --add-dir.
-#
-#   no dirs                -> whole CWD
-#   only inside dirs       -> just those subdirs (CWD scoped down)
-#   only outside dirs      -> whole CWD + the outside dirs
-#   inside + outside dirs  -> just the inside subdirs + the outside dirs
-#
-# Caveat: scoping only mounts the named subdirs, so a .git (or any root-level
-# config) that lives at the CWD root is NOT visible. Scope only to self-contained
-# subdirs (e.g. independent repos), not packages of a monorepo whose git/config
-# lives above them.
-CWD="$(pwd)"
-SCOPE_DIRS=()         # inside-CWD dirs that scope the working dir
-EXTRA_MOUNT_FLAGS=()  # -v flags for outside-CWD dirs
-EXTRA_CLAUDE_FLAGS=() # --add-dir flags for outside-CWD dirs
-EXTRA_DIRS=()         # host paths of outside-CWD dirs (for the open allowlist)
+CLAUDE_FLAGS=()
+OPEN_ROOTS=("$CWD")
 for dir in ${ADD_DIRS[@]+"${ADD_DIRS[@]}"}; do
-  if [[ ! -d "$dir" ]]; then
-    echo "claudec: --add-dir: no such directory: $dir" >&2
-    exit 1
-  fi
+  [[ -d "$dir" ]] || { echo "claudec: no such directory: $dir" >&2; exit 1; }
   abs="$(cd "$dir" && pwd)"
-  if [[ "$abs" == "$CWD" ]]; then
-    echo "claudec: --add-dir: $dir is the working directory; ignoring" >&2
-  elif [[ "$abs" == "$CWD"/* ]]; then
-    SCOPE_DIRS+=("$abs")
-  else
-    EXTRA_MOUNT_FLAGS+=(-v "$abs:$abs")
-    EXTRA_CLAUDE_FLAGS+=(--add-dir "$abs")
-    EXTRA_DIRS+=("$abs")
-  fi
+  [[ "$abs" == "$CWD" || "$abs" == "$CWD"/* ]] && continue
+  MOUNTS+=("$abs:$abs")
+  CLAUDE_FLAGS+=(--add-dir "$abs")
+  OPEN_ROOTS+=("$abs")
 done
 
-# When scoping replaces the full CWD mount, a .git at the CWD root is left out,
-# so git/gh stop working inside the container. If that's about to happen, stop —
-# unless the .git was explicitly scoped in (-a .git) or the check is skipped.
-if [[ ${#SCOPE_DIRS[@]} -gt 0 && -z "$SKIP_GIT_CHECK" && -e "$CWD/.git" ]]; then
-  git_scoped=""
-  for d in "${SCOPE_DIRS[@]}"; do
-    if [[ "$d" == "$CWD/.git" ]]; then
-      git_scoped=1
-      break
-    fi
-  done
-  if [[ -z "$git_scoped" ]]; then
-    echo "claudec: scoping leaves this repo's .git ($CWD/.git) unmounted." >&2
-    echo "claudec: git and gh won't work inside the container." >&2
-    echo "claudec: include it with '-a .git', or pass --skip-git-check to proceed without git." >&2
-    exit 1
-  fi
-fi
+MOUNT_FLAGS=()
+for m in "${MOUNTS[@]}"; do
+  if [[ -e "${m%%:*}" ]]; then MOUNT_FLAGS+=(-v "$m"); fi
+done
 
-# Mount the whole CWD by default, or just the requested subdirs when scoping.
-CWD_MOUNT_FLAGS=()
-if [[ ${#SCOPE_DIRS[@]} -gt 0 ]]; then
-  for d in "${SCOPE_DIRS[@]}"; do
-    CWD_MOUNT_FLAGS+=(-v "$d:$d")
-  done
-else
-  CWD_MOUNT_FLAGS+=(-v "$CWD:$CWD")
-fi
+# `open` bridge: the in-container shim drops request files here; this watcher
+# runs the real macOS `open`. Only http(s) URLs and files under the session's
+# working dirs are honoured.
+SPOOL="$(mktemp -d "${TMPDIR:-/tmp}/claudec-open.XXXXXX")"
 
-# --- Host `open` bridge -------------------------------------------------------
-# Give the container a working `open` that runs on the Mac. We create a private
-# per-session spool dir, mount it into the container, and run a tiny watcher here
-# on the host that turns request files (dropped by the in-container `open` shim)
-# into real `open` calls. It's torn down when this session exits (trap below),
-# so nothing lingers and concurrent claudec sessions in other tabs each get their
-# own spool and never clash. Only http(s) URLs and files under the mounted
-# working dirs are honoured — the container is untrusted, so that's enforced here.
-#
-# open_report <target> — runs the real macOS `open` and echoes "ok" on success
-# or its actual error text on failure, so the container's `open` can report the
-# true result (and exit non-zero) the way a native `open` would.
-open_report() {
-  local out
-  if out="$(open "$1" 2>&1)"; then
-    printf 'ok'
-  else
-    printf '%s' "${out:-could not open \"$1\"}"
-  fi
-}
-
-# open_watch <spool_dir> <allowed_root>...  — runs in the background for the
-# session; polls the spool and writes a resp.<id> reply for each req.<id>.
 open_watch() {
-  local spool="$1"; shift
-  local roots=() r
-  for r in "$@"; do roots+=("$(cd "$r" 2>/dev/null && pwd -P)"); done
-  local parent=$$ f id target rp ok reply
-  while [[ -d "$spool" ]] && kill -0 "$parent" 2>/dev/null; do
-    for f in "$spool"/req.*; do
+  local r p f t roots=()
+  for r in "${OPEN_ROOTS[@]}"; do roots+=("$(cd "$r" && pwd -P)"); done
+  while [[ -d "$SPOOL" ]] && kill -0 $$ 2>/dev/null; do
+    for f in "$SPOOL"/req.*; do
       [[ -e "$f" ]] || continue
-      id="${f##*/req.}"
-      target="$(cat "$f")"
-      rm -f "$f"
-      case "$target" in
-        http://*|https://*)
-          reply="$(open_report "$target")" ;;
-        *://*)
-          reply="refused: only http(s) URLs are allowed" ;;
+      t="$(cat "$f")"; rm -f "$f"
+      case "$t" in
+        http://*|https://*) open "$t" || true ;;
+        *://*) ;;
         *)
-          # Canonicalize without depending on `realpath` (absent on older macOS);
-          # cd+pwd -P also collapses any ../ escape before the allowlist check.
-          rp="$(cd "$(dirname "$target")" 2>/dev/null \
-                && printf '%s/%s' "$(pwd -P)" "$(basename "$target")")"
-          ok=""
+          p="$(cd "$(dirname "$t")" 2>/dev/null && printf '%s/%s' "$(pwd -P)" "$(basename "$t")")" || continue
           for r in "${roots[@]}"; do
-            [[ -n "$r" && ( "$rp" == "$r" || "$rp" == "$r"/* ) ]] && ok=1 && break
-          done
-          if [[ -n "$ok" && -e "$rp" ]]; then
-            reply="$(open_report "$rp")"
-          else
-            reply="refused: only files under the session's working dirs are allowed"
-          fi ;;
+            [[ "$p" == "$r" || "$p" == "$r"/* ]] && { open "$p" || true; break; }
+          done ;;
       esac
-      # Write the reply atomically (temp + rename) so the shim never reads a
-      # half-written or still-empty resp file while `open` is mid-flight.
-      printf '%s' "$reply" > "$spool/.resp.$id" \
-        && mv -f "$spool/.resp.$id" "$spool/resp.$id"
     done
     sleep 0.5
   done
 }
 
-OPEN_ENV_FLAGS=()
-OPEN_MOUNT_FLAGS=()
-OPEN_SPOOL="$(mktemp -d "${TMPDIR:-/tmp}/claudec-open.XXXXXX" 2>/dev/null || true)"
-if [[ -n "$OPEN_SPOOL" && -d "$OPEN_SPOOL" ]]; then
-  OPEN_ROOTS=()
-  if [[ ${#SCOPE_DIRS[@]} -gt 0 ]]; then
-    OPEN_ROOTS+=("${SCOPE_DIRS[@]}")
-  else
-    OPEN_ROOTS+=("$CWD")
-  fi
-  OPEN_ROOTS+=(${EXTRA_DIRS[@]+"${EXTRA_DIRS[@]}"})
+open_watch &
+WATCH_PID=$!
+trap 'kill "$WATCH_PID" 2>/dev/null; rm -rf "$SPOOL"' EXIT INT TERM
 
-  open_watch "$OPEN_SPOOL" "${OPEN_ROOTS[@]}" &
-  OPEN_PID=$!
-  trap 'kill "$OPEN_PID" 2>/dev/null; rm -rf "$OPEN_SPOOL"' EXIT INT TERM
-  OPEN_MOUNT_FLAGS+=(-v "$OPEN_SPOOL:$OPEN_SPOOL")
-  OPEN_ENV_FLAGS+=(--env "CLAUDEC_OPEN_SPOOL=$OPEN_SPOOL")
-else
-  echo "claudec: could not create the open-bridge spool; 'open' inside the container will be disabled." >&2
-fi
+PORT_FLAGS=()
+MAPS=()
+h=30000
+for c in 3000 5173; do
+  while lsof -nP -iTCP:$h -sTCP:LISTEN &>/dev/null; do h=$((h + 1)); done
+  PORT_FLAGS+=(-p "$h:$c"); MAPS+=("$c=>localhost:$h"); h=$((h + 1))
+done
+CLAUDEC_PORTS="$(IFS=,; echo "${MAPS[*]}")"
+
+CONTEXT="<container-environment>
+You are running inside an isolated Linux container ('claudec') on the user's Mac — not on the host.
+Published ports (container => host): $CLAUDEC_PORTS
+- Bind dev servers to 0.0.0.0 on a published container port; if a tool defaults to another port, override it.
+- Give the user the matching http://localhost:<host port> URL, never the container port. Live mapping: echo \$CLAUDEC_PORTS
+- 'open <http(s)-URL | file>' runs on the host Mac; published localhost ports are translated. Files must be under the session's working dirs.
+</container-environment>"
 
 container run -it --rm --init --progress none --memory 8G --cpus 4 \
-  --env HOME="$CONTAINER_HOME" \
-  --env CLAUDE_CONFIG_DIR="$CONTAINER_HOME/.config/claude" \
+  --name "$NAME" \
+  --env HOME="$AGENT_HOME" \
+  --env CLAUDE_CONFIG_DIR="$AGENT_HOME/.config/claude" \
   --env CLAUDEC=1 \
   --env CLAUDEC_PORTS="$CLAUDEC_PORTS" \
+  --env CLAUDEC_OPEN_SPOOL="$SPOOL" \
   ${ENV_FLAGS[@]+"${ENV_FLAGS[@]}"} \
-  ${OPEN_ENV_FLAGS[@]+"${OPEN_ENV_FLAGS[@]}"} \
-  "${PORT_FLAGS[@]}" \
-  ${EXTRA_MOUNT_FLAGS[@]+"${EXTRA_MOUNT_FLAGS[@]}"} \
-  ${OPEN_MOUNT_FLAGS[@]+"${OPEN_MOUNT_FLAGS[@]}"} \
-  "${CWD_MOUNT_FLAGS[@]}" \
-  -w "$(pwd)" \
-  ${MOUNT_FLAGS[@]+"${MOUNT_FLAGS[@]}"} \
+  ${PORT_FLAGS[@]+"${PORT_FLAGS[@]}"} \
+  -v "$SPOOL:$SPOOL" \
+  "${MOUNT_FLAGS[@]}" \
+  -w "$CWD" \
   -u agent \
-  "$IMAGE_NAME" \
+  "$IMAGE" \
   claude --dangerously-skip-permissions \
-  --append-system-prompt "$CLAUDEC_CONTEXT" \
-  ${EXTRA_CLAUDE_FLAGS[@]+"${EXTRA_CLAUDE_FLAGS[@]}"} \
+  --append-system-prompt "$CONTEXT" \
+  ${CLAUDE_FLAGS[@]+"${CLAUDE_FLAGS[@]}"} \
   ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

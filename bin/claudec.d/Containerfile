@@ -1,9 +1,7 @@
 FROM node:lts-bookworm
 
-# Corepack (yarn + pnpm)
 RUN corepack enable
 
-# System packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     vim ripgrep jq less tree \
     chromium fonts-liberation fonts-noto-color-emoji \
@@ -19,43 +17,29 @@ RUN install -m 0755 -d /etc/apt/keyrings \
   && apt-get update && apt-get install -y --no-install-recommends gh \
   && rm -rf /var/lib/apt/lists/*
 
-# OSC 52 clipboard shims (for tmux/terminal passthrough)
+# pbcopy/xclip via OSC 52
 RUN echo '#!/bin/bash' > /usr/local/bin/pbcopy && \
     echo 'printf "\e]52;c;%s\a" "$(base64 | tr -d "\n")" > /dev/tty' >> /usr/local/bin/pbcopy && \
     chmod +x /usr/local/bin/pbcopy && \
     ln -s /usr/local/bin/pbcopy /usr/local/bin/xclip
 
-# `open` shim — forwards to the macOS host's `open` via the claudec bridge.
-# Shadows the real xdg-open on PATH; xdg-open is pointed at it too so tools that
-# call xdg-open (browsers, etc.) also reach the host.
+# `open` forwards to the host Mac via the claudec bridge
 COPY open /usr/local/bin/open
 RUN chmod +x /usr/local/bin/open && \
     ln -sf /usr/local/bin/open /usr/local/bin/xdg-open
 
-# Create agent user
-RUN useradd -m -s /bin/bash agent
+RUN useradd -m -s /bin/bash agent \
+  && install -d -o agent -g agent /home/agent/.local/bin /home/agent/.local/share/claude /home/agent/.local/state
 
-# Force HTTPS for GitHub at the system level (container has GH_TOKEN but no SSH key).
-# Kept in /etc/gitconfig so the user's ~/.config/git can be mounted live without being clobbered.
+# force HTTPS for GitHub (container has GH_TOKEN, no SSH key)
 RUN printf '[url "https://github.com/"]\n\tinsteadOf = git@github.com:\n\tinsteadOf = ssh://git@github.com/\n' \
     > /etc/gitconfig
 
 ENV EDITOR=vim
 ENV TERM=xterm-256color
-ENV PATH="/home/agent/.local/bin:${PATH}"
-
-# Route Claude's own URL-opening (links, docs, login pages) through the host
-# `open` shim. Without BROWSER set, Claude detects headless Linux (no DISPLAY)
-# and won't open a URL at all; pointing it at the shim forwards it to the Mac.
+# .local/bin last: the persisted claude install must not shadow system binaries
+ENV PATH="${PATH}:/home/agent/.local/bin"
+# route URL-opening through the host `open` shim
 ENV BROWSER=/usr/local/bin/open
-
-# Point Puppeteer / chrome-devtools-mcp at the system Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PUPPETEER_SKIP_DOWNLOAD=1
-
-# Claude Code
-USER agent
-# CLAUDE_CACHEBUST invalidates only this layer; claudec --rebuild passes a
-# fresh value so the install re-runs without rebuilding the base layers above.
-ARG CLAUDE_CACHEBUST=0
-RUN echo "cachebust=$CLAUDE_CACHEBUST" && curl -fsSL https://claude.ai/install.sh | bash
